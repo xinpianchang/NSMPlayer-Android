@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="player_control_play" type="id"/>
+    <item name="player_control_pause" type="id"/>
+    <item name="player_control_position" type="id"/>
+    <item name="player_control_duration" type="id"/>
+    <item name="player_control_progress" type="id"/>
+    <item name="player_control_top_layout" type="id"/>
+    <item name="player_control_bottom_layout" type="id"/>
+    <item name="player_control_mask_layout" type="id"/>
+
+    <item type="id" name="player_target_visibility">false</item>
+    <item type="id" name="player_visibility_animator_provider">false</item>
+</resources>

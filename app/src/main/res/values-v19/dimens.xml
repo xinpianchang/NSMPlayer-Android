@@ -1,0 +1,9 @@
+<resources>
+    <dimen name="status_bar_height">25dp</dimen>
+    <dimen name="videoplay_back_margintop">15dp</dimen>
+    <dimen name="status_title_height">73dp</dimen>
+    <dimen name="category_sub_title_height">109dp</dimen>
+
+    <dimen name="collapse_toolbar_height">121dp</dimen>
+    <dimen name="collapse_total_height">325dp</dimen>
+</resources>

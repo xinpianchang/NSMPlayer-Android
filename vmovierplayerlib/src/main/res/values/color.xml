@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="control_view_progress">#ffffff</color>
+    <color name="control_view_secondaryProgress">#7fffffff</color>
+    <color name="control_view_background">#4affffff</color>
+</resources>

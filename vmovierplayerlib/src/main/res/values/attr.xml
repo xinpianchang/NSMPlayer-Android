@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="scaleType" format="integer">
+        <flag name="scale_fit_parent" value="0"/>
+        <flag name="scale_fill_parent" value="1"/>
+        <flag name="scale_wrap_content" value="2"/>
+        <flag name="scale_match_parent" value="3"/>
+        <flag name="scale_16_9_fit_parent" value="4"/>
+        <flag name="scale_4_3_fit_parent" value="5"/>
+    </attr>
+
+    <attr name="renderViewType" format="integer">
+        <flag name="render_surface_view" value="1"/>
+        <flag name="render_texture_view" value="2"/>
+    </attr>
+
+    <attr name="needShowPosterView" format="boolean"/>
+    <attr name="posterAnimatorDuration" format="integer"/>
+    <attr name="useController" format="boolean"/>
+    <attr name="controllerShowTimeoutMs" format="integer"/>
+    <attr name="controllerLayoutId" format="reference"/>
+
+    <declare-styleable name="BasicVideoView">
+        <attr name="scaleType"/>
+        <attr name="renderViewType"/>
+        <attr name="needShowPosterView"/>
+        <attr name="posterAnimatorDuration" />
+        <attr name="useController" />
+        <attr name="controllerLayoutId"/>
+        <attr name="controllerShowTimeoutMs"/>
+    </declare-styleable>
+
+    <declare-styleable name="VMovieVideoView">
+        <!-- 播放器 属性 -->
+        <attr name="autoPlay" format="boolean" />
+        <attr name="loop" format="boolean" />
+        <attr name="muted" format="boolean" />
+        <attr name="preload" format="boolean" />
+        <attr name="dataSource" format="string"/>
+        <attr name="playerType" format="integer">
+            <flag name="android_MediaPlayer" value="1"/>
+            <flag name="exo_MediaPlayer" value="2"/>
+        </attr>
+
+        <!-- View 属性 -->
+        <attr name="scaleType"/>
+        <attr name="renderViewType"/>
+        <attr name="needShowPosterView"/>
+        <attr name="posterAnimatorDuration" />
+        <attr name="useController" />
+        <attr name="controllerShowTimeoutMs"/>
+    </declare-styleable>
+
+    <declare-styleable name="PlayerControlView">
+        <attr name="controllerShowTimeoutMs"/>
+        <attr name="portraitInsetViewControllerLayoutId"/>
+        <attr name="portraitFullScreenViewControllerLayoutId"/>
+        <attr name="landscapeViewControllerLayoutId"/>
+        <attr name="defaultControlViewMode"/>
+    </declare-styleable>
+    <attr name="portraitFullScreenViewControllerLayoutId" format="reference"/>
+    <attr name="portraitInsetViewControllerLayoutId" format="reference"/>
+    <attr name="landscapeViewControllerLayoutId" format="reference"/>
+
+    <attr name="defaultControlViewMode" format="integer">
+        <flag name="portrait_inset" value="1"/>
+        <flag name="portrait_fullscreen " value="2"/>
+        <flag name="landscape_fullscreen" value="3"/>
+    </attr>
+</resources>

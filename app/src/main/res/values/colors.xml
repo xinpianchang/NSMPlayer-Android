@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="me_item_bg_normal">#ffffff</color>
+    <color name="me_item_bg_press">#f0f0f0</color>
+
+    <color name="videoplay_seekbar_progress">#ffffff</color>
+    <color name="videoplay_seekbar_secondaryProgress">#7fffffff</color>
+    <color name="videoplay_seekbar_background">#4affffff</color>
+</resources>

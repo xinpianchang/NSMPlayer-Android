@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/BasicVideoView"
+        android:text="Player和View分离的示范"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="80dp" />
+
+    <TextView
+        android:id="@+id/VMovieVideoView"
+        android:text="Player和View 合体的View"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="80dp" />
+
+    <TextView
+        android:id="@+id/VideoViewRecyclerView"
+        android:text="VideoView形式的 RecyclerView"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="80dp" />
+
+    <TextView
+        android:id="@+id/BasicVideoViewRecyclerView"
+        android:text="View 播放器分离形式的 RecyclerView"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="80dp" />
+
+    <TextView
+        android:id="@+id/Portrait"
+        android:text="竖屏播放器"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="80dp" />
+
+    <TextView
+        android:id="@+id/LocalVideo"
+        android:text="本地视频"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="80dp" />
+</LinearLayout>

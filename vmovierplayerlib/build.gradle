@@ -1,0 +1,98 @@
+apply plugin: 'com.android.library'
+apply plugin: 'maven'
+apply plugin: 'com.novoda.bintray-release'
+
+def defaultGroupId = 'com.vmovier.libs'
+def defaultArtifactId = 'player'
+def versionNameStr = project.hasProperty('version') ? project.property('version') : '1.0.0'
+def versionCodeStr = System.getenv("BUILD_NUMBER")
+def versionCodeNumber = versionCodeStr ? Integer.parseInt(versionCodeStr) : 1
+def bintrayUserOrg = project.hasProperty('bintrayUserOrg') ? project.property('bintrayUserOrg') : ''
+def bintrayRepoName = project.hasProperty('bintrayRepoName') ? project.property('bintrayRepoName') : ''
+def repoUrl = project.hasProperty('repoUrl') ? project.property('repoUrl') : ''
+def username = project.hasProperty('username') ? project.property('username') : ''
+def password = project.hasProperty('password') ? project.property('password') : ''
+
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 23
+        versionCode versionCodeNumber
+        versionName versionNameStr
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.google.android.exoplayer:exoplayer:r2.4.0'
+    compile "com.android.support:appcompat-v7:$googleSupportVersion"
+    compile "com.github.bumptech.glide:glide:$glideSupportVersion"
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            pom.artifactId = defaultArtifactId
+            pom.version = versionNameStr
+            pom.project {
+                name 'VMovierPlayer'
+                packaging 'aar'
+                description 'This is VMovierPlayer lib'
+                inceptionYear '2015'
+            }
+            repository(url: repoUrl) {
+                authentication(userName:username, password:password)
+            }
+            uniqueVersion=true
+        }
+    }
+}
+
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+}
+
+task androidJavadocsJar(type: Jar) {
+    classifier = 'javadoc'
+    baseName = defaultArtifactId
+    from androidJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    baseName = defaultArtifactId
+    from android.sourceSets.main.java.srcDirs
+}
+artifacts {
+    archives androidJavadocsJar
+    archives androidSourcesJar
+}
+
+task javadoc(type: Javadoc) {
+    options.encoding "UTF-8"
+    options.charSet 'UTF-8'
+}
+
+publish {
+    userOrg = bintrayUserOrg
+    groupId = defaultGroupId
+    repoName = bintrayRepoName
+    artifactId = defaultArtifactId
+    publishVersion = versionNameStr
+    desc = '新片场 Android 播放器 Lib'
+    website = 'https://github.com/xinpianchang/NSMPlayer-Android'
+}
