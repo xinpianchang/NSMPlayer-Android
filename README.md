@@ -61,13 +61,13 @@ mVMovieVideoView.play();      
 ```
 ## How To Use 
 ### 项目架构图
-![架构图](https://github.com/xinpianchang/NSMPlayer-Android/blob/master/Player.png)
+![架构图](https://github.com/xinpianchang/NSMPlayer-Android/raw/master/Player.png)
 结构图说明:
 1. 整体分为三条路线 `IPlayer`、 `BasicVideoView` 、 `IRenderView` .
 2. `IPlayer` 为对外暴露的播放器接口， 其中 `VMoviePlayer` 是 `IPlayer` 的具体实现， `VMoviePlayer` 继承了 `StateMachine` 。内部持有底层`IInternalPlayer` 的成员变量。其中 `IInternalPlayer` 是 底层播放器的行为接口， 后续如果有新的播放器内核加入， 只需要implement `IInternalPlayer`接口，完成新的实现，既可快速的加入到项目中。现在已经实现的播放器内核有谷歌现在力推的 `ExoPlayer` ,以及 `AndroidMediaplayer`。
 `VMoviePlayer` 内部定义了一套自己的 State，来协调管理不同的播放器。 在 `VMoviePlayer` 中适配不同播放器的异同性， 保证了 `VMoviePlayer` 对外只会暴露出一套行为规范。
 PlayerState 图如下:  
-  ![状态图](https://github.com/xinpianchang/NSMPlayer-Android/blob/master/PlayerState.png)  
+  ![状态图](https://github.com/xinpianchang/NSMPlayer-Android/raw/master/PlayerState.png)  
 
     状态说明:
   - IdleState 是整个播放器的起始状态，Error 状态是播放器出错之后的状态，二者都属于播放器无法工作的状态，为 UnWorkingState。 
