@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.vmovier.lib.view.BasicVideoView
+        android:id="@+id/BasicVideoView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:portraitInsetViewControllerLayoutId="@layout/item_essay_video_inset_control"
+        app:landscapeViewControllerLayoutId="@layout/item_essay_video_landscape_control"
+        app:renderViewType="render_texture_view"
+        app:needShowPosterView="true"
+        app:useController="true" />
+    <FrameLayout
+        android:id="@+id/coverLayout"
+        android:background="#60000000"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/startPlay"
+            android:src="@mipmap/control_view_play_normal"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </FrameLayout>
+</FrameLayout>

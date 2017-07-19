@@ -121,13 +121,14 @@ public class OnDefaultGestureListener extends GestureDetector.SimpleOnGestureLis
     }
 
     protected boolean onTouchDown(MotionEvent e) {
-        if (mPlayer == null) return false;
         mAxisType = AXISTYPE_UNKNOWN;
         mTouchWidthUnit = getGestureWidthUnit();
         mTouchHeightUnit = getGestureHeightUnit();
-        mVolumeWhenActionDown = mPlayer.getVolume();
-        mPositionWhenActionDown = mLastSeekToPosition = mPlayer.getCurrentPosition();
-        mDurationWhenActionDown = mPlayer.getDuration();
+        if (mPlayer != null) {
+            mVolumeWhenActionDown = mPlayer.getVolume();
+            mPositionWhenActionDown = mLastSeekToPosition = mPlayer.getCurrentPosition();
+            mDurationWhenActionDown = mPlayer.getDuration();
+        }
         float mXCoordinateWhenActionDown = e.getRawX();
 
         if (mDurationWhenActionDown == 0) {

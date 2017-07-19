@@ -46,6 +46,7 @@ dependencies {
 uploadArchives {
     repositories {
         mavenDeployer {
+            pom.groupId = defaultGroupId
             pom.artifactId = defaultArtifactId
             pom.version = versionNameStr
             pom.project {

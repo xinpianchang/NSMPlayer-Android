@@ -2,6 +2,7 @@ package com.vmovier.lib.view.render;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -117,6 +118,11 @@ public class SurfaceRenderView extends SurfaceView implements IRenderView {
         mScaleType = scaleType;
         mMeasureHelper.setScaleType(scaleType);
         requestLayout();
+    }
+
+    @Override
+    public Bitmap getScreenShot() {
+        return null;
     }
 
     /**

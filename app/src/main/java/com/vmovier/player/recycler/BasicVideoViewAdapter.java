@@ -3,6 +3,7 @@ package com.vmovier.player.recycler;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.magicbox.vmovierplayer.R;
 import com.vmovier.lib.view.BasicVideoView;
@@ -45,8 +46,10 @@ public class BasicVideoViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     public class RecyclerViewHolder extends RecyclerView.ViewHolder {
              public BasicVideoView basicVideoView;
+             public FrameLayout parent;
              RecyclerViewHolder(View itemView) {
                 super(itemView);
+                 parent = (FrameLayout) itemView;
                 basicVideoView = (BasicVideoView) itemView.findViewById(R.id.BasicVideoView);
             }
         }

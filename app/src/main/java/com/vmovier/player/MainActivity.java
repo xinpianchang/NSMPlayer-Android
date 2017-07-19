@@ -62,4 +62,14 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
     }
+
+    @OnClick(R.id.Vmovier)
+    void Vmovier() {
+        startActivity(new Intent(MainActivity.this, VMovierActivity.class));
+    }
+
+    @OnClick(R.id.Essay)
+    void Essay() {
+        startActivity(new Intent(MainActivity.this, EssayDetailActivity.class));
+    }
 }

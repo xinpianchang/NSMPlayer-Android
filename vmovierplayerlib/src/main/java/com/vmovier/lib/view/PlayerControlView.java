@@ -89,19 +89,22 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
 
     public PlayerControlView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        int portraitInsetLayoutId = R.layout.vmovie_player_control_view;
-        int portraitFullScreenLayoutId = portraitInsetLayoutId;
-        int landScapeLayoutId = portraitInsetLayoutId;
+        int defaultControlId = R.layout.vmovie_player_control_view;
+        int portraitInsetLayoutId = defaultControlId;
+        int portraitFullScreenLayoutId = defaultControlId;
+        int landScapeLayoutId = defaultControlId;
 
         showTimeoutMs = DEFAULT_SHOW_TIMEOUT_MS;
         if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(attrs,
                     R.styleable.PlayerControlView, 0, 0);
             try {
+                defaultControlId = a.getResourceId(R.styleable.PlayerControlView_defaultControllerLayoutId, defaultControlId);
+
                 showTimeoutMs = a.getInt(R.styleable.PlayerControlView_controllerShowTimeoutMs, showTimeoutMs);
-                portraitInsetLayoutId = a.getResourceId(R.styleable.PlayerControlView_portraitInsetViewControllerLayoutId, portraitInsetLayoutId);
-                portraitFullScreenLayoutId = a.getResourceId(R.styleable.PlayerControlView_portraitFullScreenViewControllerLayoutId, portraitFullScreenLayoutId);
-                landScapeLayoutId = a.getResourceId(R.styleable.PlayerControlView_landscapeViewControllerLayoutId, landScapeLayoutId);
+                portraitInsetLayoutId = a.getResourceId(R.styleable.PlayerControlView_portraitInsetViewControllerLayoutId, defaultControlId);
+                portraitFullScreenLayoutId = a.getResourceId(R.styleable.PlayerControlView_portraitFullScreenViewControllerLayoutId, defaultControlId);
+                landScapeLayoutId = a.getResourceId(R.styleable.PlayerControlView_landscapeViewControllerLayoutId, defaultControlId);
                 mCurrentViewMode = a.getInt(R.styleable.PlayerControlView_defaultControlViewMode, mCurrentViewMode);
             } finally {
                 a.recycle();

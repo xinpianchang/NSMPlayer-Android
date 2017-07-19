@@ -1,29 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item android:id="@android:id/background">
-        <shape android:shape="rectangle">
-            <corners android:radius="2dp" />
-            <solid android:color="@color/videoplay_seekbar_background" />
-            <size android:height="4dp" />
+        <shape>
+            <solid android:color="@android:color/holo_red_dark"/>
+            <size android:height="4dp"/>
         </shape>
     </item>
     <item android:id="@android:id/secondaryProgress">
-        <scale android:scaleWidth="100%">
-            <shape android:shape="rectangle">
-                <corners android:radius="2dp" />
-                <solid android:color="@color/videoplay_seekbar_secondaryProgress" />
-                <size android:height="4dp" />
+        <clip>
+            <shape>
+                <solid android:color="#66ffffff"/>
+                <size android:height="4dp"/>
             </shape>
-        </scale>
+        </clip>
     </item>
     <item android:id="@android:id/progress">
-        <scale android:scaleWidth="100%">
-            <shape android:shape="rectangle">
-                <corners android:radius="2dp" />
-                <solid android:color="@color/videoplay_seekbar_progress" />
-                <size android:height="4dp" />
+        <clip>
+            <shape>
+                <solid android:color="#fff"/>
+                <size android:height="4dp"/>
             </shape>
-        </scale>
+        </clip>
     </item>
-
 </layer-list>

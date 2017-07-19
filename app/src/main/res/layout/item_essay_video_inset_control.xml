@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#30000000"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@id/player_control_play"
+        android:src="@drawable/control_view_play_selector"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:scaleType="centerInside"
+        android:layout_width="36dp"
+        android:layout_height="36dp" />
+    <ImageView
+        android:id="@id/player_control_pause"
+        android:src="@drawable/control_view_pause_selector"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:scaleType="centerInside"
+        android:layout_width="36dp"
+        android:layout_height="36dp" />
+
+    <LinearLayout
+        android:id="@id/player_control_bottom_layout"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <SeekBar
+            android:id="@id/player_control_progress"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="-5dp"
+            android:maxHeight="4dp"
+            android:minHeight="4dp"
+            android:progressDrawable="@drawable/control_view_progress_color"
+            android:splitTrack="false"
+            android:thumb="@drawable/control_view_timeline_circle"
+            android:layout_above="@id/player_control_bottom_layout"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:id="@id/player_control_position"
+            android:textColor="@android:color/white"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:text="/"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
+            android:textColor="@android:color/white"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@id/player_control_duration"
+            android:textColor="@android:color/white"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/changeToFullScreen"
+            android:scaleType="centerInside"
+            android:src="@mipmap/videocontrol_full_size"
+            android:layout_width="48dp"
+            android:layout_height="48dp" />
+    </LinearLayout>
+
+
+</RelativeLayout>

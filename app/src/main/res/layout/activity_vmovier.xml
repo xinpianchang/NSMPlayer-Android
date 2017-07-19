@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.vmovier.lib.view.VMovieVideoView
+        android:id="@+id/VMovieVideoView"
+        app:needShowPosterView="true"
+        app:useController="true"
+        app:renderViewType="render_texture_view"
+        android:layout_width="match_parent"
+        android:layout_height="202.5dp"/>
+    <ImageView
+        android:id="@+id/image"
+        android:layout_below="@+id/VMovieVideoView"
+        android:layout_above="@+id/control"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <LinearLayout
+        android:id="@+id/control"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+        <TextView
+            android:id="@+id/show"
+            android:text="show"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="40dp" />
+        <TextView
+            android:id="@+id/hide"
+            android:text="hide"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="40dp" />
+        <TextView
+            android:id="@+id/screenShot"
+            android:text="截图"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="40dp" />
+    </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/VolumeSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:layout_below="@+id/VMovieVideoView"
+        android:layout_marginTop="-13dp"
+        android:maxHeight="2dp"
+        android:minHeight="2dp"
+        android:progressDrawable="@drawable/videoplayer_seekbar_progress"
+        android:splitTrack="false"
+        android:thumbOffset="2dp"
+        android:thumb="@drawable/videoplayer_timeline_circle" />
+</RelativeLayout>

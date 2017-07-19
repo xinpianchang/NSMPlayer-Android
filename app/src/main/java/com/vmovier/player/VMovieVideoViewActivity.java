@@ -118,7 +118,7 @@ public class VMovieVideoViewActivity extends AppCompatActivity implements Compou
         }
         requestVideoLayoutParam();
 
-        boolean isRestore = (savedInstanceState != null);
+        final boolean isRestore = (savedInstanceState != null);
         if (isRestore) {
             PlayerLog.d(TAG, "savedInstanceState != null 播放器自己恢复");
             paused = savedInstanceState.getBoolean(ISPLAYING_WHENPAUSE);

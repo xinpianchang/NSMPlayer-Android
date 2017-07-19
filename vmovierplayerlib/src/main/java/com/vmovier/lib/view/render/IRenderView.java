@@ -1,5 +1,6 @@
 package com.vmovier.lib.view.render;
 
+import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,6 +30,8 @@ public interface IRenderView {
     int SCALE_4_3_FIT_PARENT = 5;
 
     View getView();
+
+    @Nullable Bitmap getScreenShot();
 
     boolean shouldWaitForResize();
 

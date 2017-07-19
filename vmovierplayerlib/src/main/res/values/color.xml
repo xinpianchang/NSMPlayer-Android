@@ -3,4 +3,6 @@
     <color name="control_view_progress">#ffffff</color>
     <color name="control_view_secondaryProgress">#7fffffff</color>
     <color name="control_view_background">#4affffff</color>
+
+    <color name="recyclerview_background">#4D000000</color>
 </resources>

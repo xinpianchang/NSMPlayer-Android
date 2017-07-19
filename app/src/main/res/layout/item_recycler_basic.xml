@@ -8,6 +8,7 @@
         android:id="@+id/BasicVideoView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:renderViewType="render_texture_view"
         app:needShowPosterView="true"
         app:useController="true" />
 </FrameLayout>

@@ -3,6 +3,7 @@ package com.vmovier.lib.view;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -24,6 +25,7 @@ import com.vmovier.lib.player.VideoSize;
 import com.vmovier.lib.utils.PlayerLog;
 import com.vmovier.lib.view.render.IRenderView;
 import com.vmovier.lib.view.render.SurfaceRenderView;
+import com.vmovier.lib.view.render.TextureRenderView;
 import com.vmovier.player.R;
 
 
@@ -130,6 +132,8 @@ public class BasicVideoView extends FrameLayout {
         initControlView(context, attrs);
 
         mOnGenerateGestureDetectorListener = new OnDefaultGenerateGestureDetectorListener();
+        mGestureDetector = mOnGenerateGestureDetectorListener.generateGestureDetector(context, null, mControlView);
+
         setKeepScreenOn(true);
         setBackground(new ColorDrawable(Color.BLACK));
     }
@@ -147,13 +151,23 @@ public class BasicVideoView extends FrameLayout {
             case RENDER_NONE:
                 setRenderView(null);
                 break;
-            case RENDER_SURFACE_VIEW: {
+            case RENDER_SURFACE_VIEW:  {
                 SurfaceRenderView renderView = new SurfaceRenderView(getContext());
                 setRenderView(renderView);
                 break;
             }
+            case RENDER_TEXTURE_VIEW: {
+                TextureRenderView renderView = new TextureRenderView(getContext());
+                if (mPlayer != null) {
+                    renderView.getSurfaceHolder().bindToMediaPlayer(mPlayer);
+                    renderView.setVideoSize(mVideoSize.videoWidth, mVideoSize.videoHeight);
+                    renderView.setVideoSampleAspectRatio(mVideoSize.videoSarNum, mVideoSize.videoSarDen);
+                    renderView.setScaleType(mScaleType);
+                }
+                setRenderView(renderView);
+                break;
+            }
             default:
-                // TODO.
                 break;
         }
     }
@@ -507,6 +521,10 @@ public class BasicVideoView extends FrameLayout {
             handled = mGestureDetector.onTouchEvent(ev);
         }
         return handled;
+    }
+
+    public @Nullable Bitmap getScreenShot() {
+        return mRenderView == null ? null : mRenderView.getScreenShot();
     }
 
     @Override

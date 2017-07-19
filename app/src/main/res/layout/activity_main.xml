@@ -45,4 +45,18 @@
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="80dp" />
+
+    <TextView
+        android:id="@+id/Vmovier"
+        android:text="V电影视频详情页"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="80dp" />
+
+    <TextView
+        android:id="@+id/Essay"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:gravity="center"
+        android:text="V电影文章详情页" />
 </LinearLayout>
