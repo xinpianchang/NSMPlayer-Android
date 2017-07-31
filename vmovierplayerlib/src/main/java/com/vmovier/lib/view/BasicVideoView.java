@@ -28,6 +28,9 @@ import com.vmovier.lib.view.render.SurfaceRenderView;
 import com.vmovier.lib.view.render.TextureRenderView;
 import com.vmovier.player.R;
 
+import java.util.Formatter;
+import java.util.Locale;
+
 
 @SuppressWarnings("unused")
 public class BasicVideoView extends FrameLayout {
@@ -41,8 +44,6 @@ public class BasicVideoView extends FrameLayout {
     protected int mPosterAnimatorDuration;
     // 渲染模式
     protected int mRenderType;
-    // 控制层View 显示时间
-    protected int mControllerShowTimeoutMs;
     // 是否使用默认的Controller
     protected boolean mUseController = true;
 
@@ -56,6 +57,8 @@ public class BasicVideoView extends FrameLayout {
     protected PlayerControlView mControlView;
     protected GestureDetector mGestureDetector;
     protected int mScreenMode = PLAYERSCREENMODE_PORTRAIT_INSET;
+    protected StringBuilder mFormatBuilder;
+    protected Formatter mFormatter;
 
     // 竖屏小屏模式
     public static final int PLAYERSCREENMODE_PORTRAIT_INSET = 1;
@@ -114,7 +117,6 @@ public class BasicVideoView extends FrameLayout {
                 mRenderType = a.getInteger(R.styleable.BasicVideoView_renderViewType, RENDER_SURFACE_VIEW);
                 mScaleType = a.getInteger(R.styleable.BasicVideoView_scaleType, SCALE_FIT_PARENT);
                 mUseController = a.getBoolean(R.styleable.BasicVideoView_useController, false);
-                mControllerShowTimeoutMs = a.getInteger(R.styleable.BasicVideoView_controllerShowTimeoutMs, DEFAULT_SHOWCONTROLLER_TIMEOUT_MS);
                 mNeedShowPosterView = a.getBoolean(R.styleable.BasicVideoView_needShowPosterView, false);
                 mPosterAnimatorDuration = a.getInteger(R.styleable.BasicVideoView_posterAnimatorDuration, DEFAULT_POSTER_ANIMATOR_DURATION);
             } finally {
@@ -136,9 +138,10 @@ public class BasicVideoView extends FrameLayout {
 
         setKeepScreenOn(true);
         setBackground(new ColorDrawable(Color.BLACK));
+
+        mFormatBuilder = new StringBuilder();
+        mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
     }
-
-
 
     @Override
     protected void finalize() throws Throwable {
@@ -370,14 +373,13 @@ public class BasicVideoView extends FrameLayout {
     }
 
     public int getControllerShowTimeoutMs() {
-        return mControllerShowTimeoutMs;
+        return mControlView != null ? mControlView.getControllerShowTimeoutMs() : DEFAULT_SHOWCONTROLLER_TIMEOUT_MS;
     }
 
     public void setControllerShowTimeoutMs(int controllerShowTimeoutMs) {
-        if (this.mControllerShowTimeoutMs == controllerShowTimeoutMs) {
-            return;
+        if (mControlView != null) {
+            mControlView.setControllerShowTimeoutMs(controllerShowTimeoutMs);
         }
-        this.mControllerShowTimeoutMs = controllerShowTimeoutMs;
     }
 
     public boolean isControlViewVisible() {
@@ -525,6 +527,27 @@ public class BasicVideoView extends FrameLayout {
 
     public @Nullable Bitmap getScreenShot() {
         return mRenderView == null ? null : mRenderView.getScreenShot();
+    }
+
+    public @Nullable String millis2Str(long timeMs) {
+        if (mFormatBuilder == null || mFormatter == null) {
+            PlayerLog.d(TAG, "FormatBuilder init failed");
+            return "";
+        }
+        if (timeMs < 0) {
+            timeMs = -timeMs;
+        }
+        long totalSeconds = timeMs / 1000;
+        long seconds = totalSeconds % 60;
+        long minutes = (totalSeconds / 60) % 60;
+        long hours = totalSeconds / 3600;
+
+        mFormatBuilder.setLength(0);
+        if (hours > 0) {
+            return (mFormatter.format("%d:%02d:%02d", hours, minutes, seconds).toString());
+        } else {
+            return (mFormatter.format("%02d:%02d", minutes, seconds).toString());
+        }
     }
 
     @Override

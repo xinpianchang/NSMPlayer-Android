@@ -43,7 +43,7 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
     private SeekBar mProgressBar;
     private View mTopLayout, mBottomLayout;
 
-    private int showTimeoutMs;
+    private int mShowTimeoutMs;
     private IPlayer mPlayer;
     private boolean isAttachedToWindow;
     private final ComponentListener componentListener;
@@ -94,14 +94,14 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
         int portraitFullScreenLayoutId = defaultControlId;
         int landScapeLayoutId = defaultControlId;
 
-        showTimeoutMs = DEFAULT_SHOW_TIMEOUT_MS;
+        mShowTimeoutMs = DEFAULT_SHOW_TIMEOUT_MS;
         if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(attrs,
                     R.styleable.PlayerControlView, 0, 0);
             try {
                 defaultControlId = a.getResourceId(R.styleable.PlayerControlView_defaultControllerLayoutId, defaultControlId);
 
-                showTimeoutMs = a.getInt(R.styleable.PlayerControlView_controllerShowTimeoutMs, showTimeoutMs);
+                mShowTimeoutMs = a.getInt(R.styleable.PlayerControlView_controllerShowTimeoutMs, mShowTimeoutMs);
                 portraitInsetLayoutId = a.getResourceId(R.styleable.PlayerControlView_portraitInsetViewControllerLayoutId, defaultControlId);
                 portraitFullScreenLayoutId = a.getResourceId(R.styleable.PlayerControlView_portraitFullScreenViewControllerLayoutId, defaultControlId);
                 landScapeLayoutId = a.getResourceId(R.styleable.PlayerControlView_landscapeViewControllerLayoutId, defaultControlId);
@@ -320,11 +320,22 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
     @Override
     public void hideAfterTimeout() {
         removeCallbacks(hideAction);
-        if (showTimeoutMs > 0) {
+        if (mShowTimeoutMs > 0) {
             if (isAttachedToWindow) {
-                postDelayed(hideAction, showTimeoutMs);
+                postDelayed(hideAction, mShowTimeoutMs);
             }
         }
+    }
+
+    public int getControllerShowTimeoutMs() {
+        return mShowTimeoutMs;
+    }
+
+    public void setControllerShowTimeoutMs(int controllerShowTimeoutMs) {
+        if (this.mShowTimeoutMs == controllerShowTimeoutMs) {
+            return;
+        }
+        this.mShowTimeoutMs = controllerShowTimeoutMs;
     }
 
     /**

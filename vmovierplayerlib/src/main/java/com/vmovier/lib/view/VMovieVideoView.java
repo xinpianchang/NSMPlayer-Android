@@ -22,6 +22,10 @@ import com.vmovier.lib.player.VideoViewDataSource;
 import com.vmovier.lib.utils.PlayerLog;
 import com.vmovier.player.R;
 
+import java.util.Formatter;
+import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 @SuppressWarnings("unused, WeakerAccess")
 public class VMovieVideoView extends BasicVideoView {
     private static final String TAG = VMovieVideoView.class.getSimpleName();
@@ -42,7 +46,7 @@ public class VMovieVideoView extends BasicVideoView {
 
     private static final String SUSPENDED_BUNDLE = "suspended_bundle";
     private static final String ERROR_BUNDLE = "error_bundle";
-    private IVMovieVideoViewListener mMovieVideoViewListener;
+    private CopyOnWriteArraySet<IVMovieVideoViewListener> mMovieVideoViewListeners = new CopyOnWriteArraySet<>();
 
     public VMovieVideoView(Context context) {
         super(context);
@@ -80,7 +84,6 @@ public class VMovieVideoView extends BasicVideoView {
                 mRenderType = a.getInteger(R.styleable.VMovieVideoView_renderViewType, RENDER_SURFACE_VIEW);
                 mScaleType = a.getInteger(R.styleable.VMovieVideoView_scaleType, SCALE_FIT_PARENT);
                 mUseController = a.getBoolean(R.styleable.VMovieVideoView_useController, false);
-                mControllerShowTimeoutMs = a.getInteger(R.styleable.VMovieVideoView_controllerShowTimeoutMs, DEFAULT_SHOWCONTROLLER_TIMEOUT_MS);
                 mNeedShowPosterView = a.getBoolean(R.styleable.VMovieVideoView_needShowPosterView, false);
                 mPosterAnimatorDuration = a.getInteger(R.styleable.VMovieVideoView_posterAnimatorDuration, DEFAULT_POSTER_ANIMATOR_DURATION);
 
@@ -122,6 +125,9 @@ public class VMovieVideoView extends BasicVideoView {
 
         mOnGenerateGestureDetectorListener = new OnDefaultGenerateGestureDetectorListener();
         super.setPlayer(mPlayer);
+
+        mFormatBuilder = new StringBuilder();
+        mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
     }
 
     @Override
@@ -171,11 +177,12 @@ public class VMovieVideoView extends BasicVideoView {
         }
     }
 
-    public void setVMovieVideoViewListener(IVMovieVideoViewListener listener) {
-        if (this.mMovieVideoViewListener == listener) {
-            return;
-        }
-        this.mMovieVideoViewListener = listener;
+    public void addVMovieVideoViewListener(@NonNull IVMovieVideoViewListener listener) {
+        mMovieVideoViewListeners.add(listener);
+    }
+
+    public void removeVMovieVideoViewListener(@NonNull IVMovieVideoViewListener listener) {
+        mMovieVideoViewListeners.remove(listener);
     }
 
     // 彻底销毁播放器 不保存任何状态
@@ -328,13 +335,11 @@ public class VMovieVideoView extends BasicVideoView {
         if (restoreBundle == null) {
             PlayerLog.d(TAG, "restoreBundle == null");
         } else {
-            mControllerShowTimeoutMs = restoreBundle.getInt(SAVE_CONTROLLER_SHOWTIME, mControllerShowTimeoutMs);
             mNeedShowPosterView = restoreBundle.getBoolean(SAVE_NEEDSHOWPOSTER, mNeedShowPosterView);
             mPosterAnimatorDuration = restoreBundle.getInt(SAVE_POSTER_ANIMATOR_DURATION, mPosterAnimatorDuration);
             mRenderType = restoreBundle.getInt(SAVE_RENDERTYPE, mRenderType);
             mScaleType = restoreBundle.getInt(SAVE_SCALETYPE ,mScaleType);
             mUseController = restoreBundle.getBoolean(SAVE_USECONTROLLER, mUseController);
-
 
             Bundle suspendBundle = restoreBundle.getBundle(SUSPENDED_BUNDLE);
             if (suspendBundle != null) {
@@ -369,7 +374,6 @@ public class VMovieVideoView extends BasicVideoView {
             bundle = new Bundle();
         }
 
-        bundle.putInt(SAVE_CONTROLLER_SHOWTIME, mControllerShowTimeoutMs);
         bundle.putBoolean(SAVE_NEEDSHOWPOSTER, mNeedShowPosterView);
         bundle.putInt(SAVE_POSTER_ANIMATOR_DURATION, mPosterAnimatorDuration);
         bundle.putInt(SAVE_RENDERTYPE, mRenderType);
@@ -491,16 +495,16 @@ public class VMovieVideoView extends BasicVideoView {
                     break;
             }
             super.onStateChanged(oldState, newState);
-            if (mMovieVideoViewListener != null) {
-                mMovieVideoViewListener.onStateChanged(oldState, newState);
+            for (IVMovieVideoViewListener listener : mMovieVideoViewListeners) {
+                listener.onStateChanged(oldState, newState);
             }
         }
 
         @Override
         public void onVolumeChanged(int startVolume, int finalVolume) {
             PlayerLog.d(TAG, "onVolumeChanged startVolume is " + startVolume + " , finalVolume is " + finalVolume);
-            if (mMovieVideoViewListener != null) {
-                mMovieVideoViewListener.onVolumeChanged(startVolume, finalVolume);
+            for (IVMovieVideoViewListener listener : mMovieVideoViewListeners) {
+                listener.onVolumeChanged(startVolume, finalVolume);
             }
         }
     }

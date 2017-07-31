@@ -134,7 +134,7 @@ public class VMovieVideoViewActivity extends AppCompatActivity implements Compou
                 mVMovieVideoView.setMediaDataSource(d);
             }
         }
-        mVMovieVideoView.setVMovieVideoViewListener(mVideoListener);
+        mVMovieVideoView.addVMovieVideoViewListener(mVideoListener);
         mVMovieVideoView.setOnGenerateGestureDetectorListener(new TestOnGenerateGestureDetectorListener());
 
         ArrayAdapter<String> urlsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, videoTitles);
@@ -178,7 +178,7 @@ public class VMovieVideoViewActivity extends AppCompatActivity implements Compou
         super.onDestroy();
         mainHandler.removeCallbacksAndMessages(null);
         mainHandler = null;
-        mVMovieVideoView.setVMovieVideoViewListener(null);
+        mVMovieVideoView.removeVMovieVideoViewListener(mVideoListener);
         mVMovieVideoView.stopPlayback();
         mVMovieVideoView = null;
     }

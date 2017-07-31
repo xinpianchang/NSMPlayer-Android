@@ -923,18 +923,18 @@ class VMoviePlayer extends StateMachine implements IPlayer {
                 case EVENT_UPDATE_SURFACE:
                     if (mInternalMediaPlayer != null) {
                         mInternalMediaPlayer.setSurface(mSurface);
-                        if (mPlayerType == PLAYERTYPE_EXO) {
-                            //FIXME WorkAround, 解决ExoPlayer change RenderView的时候 有可能出现的黑屏现象.
-                            long duration = mInternalMediaPlayer.getDuration();
-                            long position = mInternalMediaPlayer.getCurrentPosition();
-                            if (duration > 0) {
-                                if (position - 20 >= 0) {
-                                    mInternalMediaPlayer.seekTo(position - 20);
-                                } else if (position + 20 < duration) {
-                                    mInternalMediaPlayer.seekTo(duration + 20);
-                                }
-                            }
-                        }
+//                        if (mPlayerType == PLAYERTYPE_EXO && mSurface != null) {
+//                            //FIXME WorkAround, 解决ExoPlayer change RenderView的时候 有可能出现的黑屏现象.
+//                            long duration = mInternalMediaPlayer.getDuration();
+//                            long position = mInternalMediaPlayer.getCurrentPosition();
+//                            if (duration > 0) {
+//                                if (position - 20 >= 0) {
+//                                    mInternalMediaPlayer.seekTo(position - 20);
+//                                } else if (position + 20 < duration) {
+//                                    mInternalMediaPlayer.seekTo(duration + 20);
+//                                }
+//                            }
+//                        }
                     }
                     return HANDLED;
                 case EVENT_BUFFER_START:

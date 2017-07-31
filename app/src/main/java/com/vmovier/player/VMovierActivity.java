@@ -35,6 +35,8 @@ public class VMovierActivity extends AppCompatActivity {
         setContentView(R.layout.activity_vmovier);
         ButterKnife.bind(this);
         mSeekBar.setPadding(0, 0, 0, 0);
+        mSeekBar.setMax(1000);
+        mSeekBar.setOnSeekBarChangeListener(mSeekBarChangeListener);
         mVMovieVideoView.setAutoPlay(true);
         mVMovieVideoView.setPosterUrl("http://cs.vmoiver.com/Uploads/Magic/post/2016-12-05/584513723605e.jpg");
         VideoViewDataSource dataSource = new VideoViewDataSource(Uri.parse("http://125.39.21.11/xdispatch/7ryl2t.com1.z0.glb.clouddn.com/5857c31897c89.mp4"));
@@ -84,4 +86,32 @@ public class VMovierActivity extends AppCompatActivity {
             mImageView.setImageBitmap(bitmap);
         }
     }
+
+    private boolean isTrackingTouch = false;
+
+    private SeekBar.OnSeekBarChangeListener mSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            if (!fromUser) return;
+            long duration = mVMovieVideoView.getDuration();
+            long newPosition = (duration * progress) / 1000L;
+            // 如果duration 为0, 则记录1下 seek的比例
+            mVMovieVideoView.seekTo(newPosition);
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+            isTrackingTouch = true;
+            mVMovieVideoView.setControllerShowTimeoutMs(0);
+            mVMovieVideoView.showController();
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            isTrackingTouch = false;
+            mVMovieVideoView.setControllerShowTimeoutMs(5000);
+            mVMovieVideoView.showController();
+        }
+    };
+
 }
