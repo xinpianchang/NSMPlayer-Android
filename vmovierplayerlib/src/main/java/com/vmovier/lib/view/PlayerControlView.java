@@ -13,7 +13,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.vmovier.lib.player.IPlayer;
-import com.vmovier.lib.player.VideoSize;
 import com.vmovier.player.R;
 
 import java.util.Formatter;
@@ -245,11 +244,11 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
             return;
         }
         if (this.mPlayer != null) {
-            this.mPlayer.removeVideoListener(componentListener);
+            this.mPlayer.removeVideoStateListener(componentListener);
         }
         this.mPlayer = player;
         if (player != null) {
-            player.addVideoListener(componentListener);
+            player.addVideoStateListener(componentListener);
         }
         updateAll();
     }
@@ -473,7 +472,7 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
     }
 
 
-    private final class ComponentListener implements IVideoListener,
+    private final class ComponentListener implements IVideoStateListener,
             SeekBar.OnSeekBarChangeListener, OnClickListener {
         @Override
         public void onClick(View v) {
@@ -519,11 +518,6 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
 
         @Override
         public void onVolumeChanged(int startVolume, int finalVolume) {
-
-        }
-
-        @Override
-        public void onVideoSizeChanged(IPlayer mp, VideoSize videoSize) {
 
         }
     }

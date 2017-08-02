@@ -22,11 +22,10 @@ import com.magicbox.vmovierplayer.R;
 import com.vmovier.lib.player.IPlayer;
 import com.vmovier.lib.player.IPlayerFactory;
 import com.vmovier.lib.player.MediaError;
-import com.vmovier.lib.player.VideoSize;
 import com.vmovier.lib.player.VideoViewDataSource;
 import com.vmovier.lib.utils.PlayerLog;
 import com.vmovier.lib.view.BasicVideoView;
-import com.vmovier.lib.view.IVideoListener;
+import com.vmovier.lib.view.IVideoStateListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -107,7 +106,7 @@ public class BasicVideoViewActivity extends AppCompatActivity implements Compoun
         mPlayer = IPlayerFactory.newInstance(this);
         mPlayer.setAutoPlay(true);
         mPlayer.setLoop(isLoop);
-        mPlayer.addVideoListener(mVideoListener);
+        mPlayer.addVideoStateListener(mVideoListener);
         mPlayer.setPlayerType(isExo ? IPlayer.PLAYERTYPE_EXO : IPlayer.PLAYERTYPE_ANDROIDMEDIA);
         mPlayer.setMuted(isMuted);
 
@@ -151,7 +150,7 @@ public class BasicVideoViewActivity extends AppCompatActivity implements Compoun
         mainHandler.removeCallbacksAndMessages(null);
         mainHandler = null;
         mPlayer.stopPlayback();
-        mPlayer.removeVideoListener(mVideoListener);
+        mPlayer.removeVideoStateListener(mVideoListener);
         mPlayer = null;
     }
 
@@ -276,7 +275,7 @@ public class BasicVideoViewActivity extends AppCompatActivity implements Compoun
         }
     }
 
-    IVideoListener mVideoListener = new IVideoListener() {
+    IVideoStateListener mVideoListener = new IVideoStateListener() {
         @Override
         public void onStateChanged(int oldState, int newState) {
             String stateString = "";
@@ -326,11 +325,6 @@ public class BasicVideoViewActivity extends AppCompatActivity implements Compoun
             if (mVolumeSeekBar != null) {
                 mVolumeSeekBar.setProgress(finalVolume);
             }
-        }
-
-        @Override
-        public void onVideoSizeChanged(IPlayer mp, VideoSize videoSize) {
-
         }
     };
 

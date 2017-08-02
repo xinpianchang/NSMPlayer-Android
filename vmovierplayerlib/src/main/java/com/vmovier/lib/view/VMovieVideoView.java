@@ -24,7 +24,6 @@ import com.vmovier.player.R;
 
 import java.util.Formatter;
 import java.util.Locale;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @SuppressWarnings("unused, WeakerAccess")
 public class VMovieVideoView extends BasicVideoView {
@@ -46,7 +45,6 @@ public class VMovieVideoView extends BasicVideoView {
 
     private static final String SUSPENDED_BUNDLE = "suspended_bundle";
     private static final String ERROR_BUNDLE = "error_bundle";
-    private CopyOnWriteArraySet<IVMovieVideoViewListener> mMovieVideoViewListeners = new CopyOnWriteArraySet<>();
 
     public VMovieVideoView(Context context) {
         super(context);
@@ -175,14 +173,6 @@ public class VMovieVideoView extends BasicVideoView {
         } else {
             PlayerLog.d(TAG, "retry failed, ErrorVideoStateBundle == null");
         }
-    }
-
-    public void addVMovieVideoViewListener(@NonNull IVMovieVideoViewListener listener) {
-        mMovieVideoViewListeners.add(listener);
-    }
-
-    public void removeVMovieVideoViewListener(@NonNull IVMovieVideoViewListener listener) {
-        mMovieVideoViewListeners.remove(listener);
     }
 
     // 彻底销毁播放器 不保存任何状态
@@ -495,28 +485,7 @@ public class VMovieVideoView extends BasicVideoView {
                     break;
             }
             super.onStateChanged(oldState, newState);
-            for (IVMovieVideoViewListener listener : mMovieVideoViewListeners) {
-                listener.onStateChanged(oldState, newState);
-            }
-        }
-
-        @Override
-        public void onVolumeChanged(int startVolume, int finalVolume) {
-            PlayerLog.d(TAG, "onVolumeChanged startVolume is " + startVolume + " , finalVolume is " + finalVolume);
-            for (IVMovieVideoViewListener listener : mMovieVideoViewListeners) {
-                listener.onVolumeChanged(startVolume, finalVolume);
-            }
         }
     }
 
-    public interface IVMovieVideoViewListener {
-        /**
-         * state值
-         * @param oldState 老状态
-         * @param newState 新状态
-         */
-        void onStateChanged(int oldState, int newState);
-
-        void onVolumeChanged(int oldVolume, int newVolume);
-    }
 }

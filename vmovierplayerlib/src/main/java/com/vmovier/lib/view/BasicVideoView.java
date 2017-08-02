@@ -30,6 +30,7 @@ import com.vmovier.player.R;
 
 import java.util.Formatter;
 import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 
 @SuppressWarnings("unused")
@@ -53,7 +54,7 @@ public class BasicVideoView extends FrameLayout {
     protected VideoSize mVideoSize = new VideoSize();
     protected IRenderView mRenderView;
     protected IRenderView.ISurfaceHolder mSurfaceHolder;
-    protected IVideoListener mVideoListener;
+    protected BasicVideoListener mVideoListener;
     protected PlayerControlView mControlView;
     protected GestureDetector mGestureDetector;
     protected int mScreenMode = PLAYERSCREENMODE_PORTRAIT_INSET;
@@ -86,6 +87,8 @@ public class BasicVideoView extends FrameLayout {
     private static int instance = 0;
     private int instanceId;
     protected OnGenerateGestureDetectorListener mOnGenerateGestureDetectorListener;
+
+    private CopyOnWriteArraySet<IVideoStateListener> mVideoStateListeners = new CopyOnWriteArraySet<>();
 
     public BasicVideoView(Context context) {
         this(context, null);
@@ -335,6 +338,14 @@ public class BasicVideoView extends FrameLayout {
         this.mNeedShowPosterView = needShowPosterView;
     }
 
+    public void addVideoStateListener(@NonNull IVideoStateListener listener) {
+        mVideoStateListeners.add(listener);
+    }
+
+    public void removeVideoStateListener(@NonNull IVideoStateListener listener) {
+        mVideoStateListeners.remove(listener);
+    }
+
     public int getScaleType() {
         return mScaleType;
     }
@@ -453,7 +464,8 @@ public class BasicVideoView extends FrameLayout {
     public void setPlayer(IPlayer player) {
         if (mPlayer == player) return;
         if (this.mPlayer != null) {
-            this.mPlayer.removeVideoListener(mVideoListener);
+            this.mPlayer.removeVideoSizeListener(mVideoListener);
+            this.mPlayer.removeVideoStateListener(mVideoListener);
             this.mPlayer.setDisplay(null);
             this.mPlayer = null;
         }
@@ -469,7 +481,8 @@ public class BasicVideoView extends FrameLayout {
 
         if (mPlayer != null) {
             bindSurfaceHolder(mPlayer, mSurfaceHolder);
-            mPlayer.addVideoListener(mVideoListener);
+            mPlayer.addVideoSizeListener(mVideoListener);
+            mPlayer.addVideoStateListener(mVideoListener);
             if (mPlayer.isCurrentState(IPlayer.STATE_MASK_PREPARED)) {
                 hidePosterView();
             }
@@ -493,6 +506,12 @@ public class BasicVideoView extends FrameLayout {
     public void hideController() {
         if (mControlView != null) {
             mControlView.hide();
+        }
+    }
+
+    public void hideControllerAfterTimeout() {
+        if (mControlView != null) {
+            mControlView.hideAfterTimeout();
         }
     }
 
@@ -558,7 +577,8 @@ public class BasicVideoView extends FrameLayout {
             mControlView.setPlayer(mPlayer);
         }
         if (mPlayer != null) {
-            mPlayer.addVideoListener(mVideoListener);
+            mPlayer.addVideoSizeListener(mVideoListener);
+            mPlayer.addVideoStateListener(mVideoListener);
             if (mSurfaceHolder != null) {
                 mSurfaceHolder.bindToMediaPlayer(mPlayer);
             }
@@ -574,11 +594,12 @@ public class BasicVideoView extends FrameLayout {
         }
         if (mPlayer != null) {
             mPlayer.setDisplay(null);
-            mPlayer.removeVideoListener(mVideoListener);
+            this.mPlayer.removeVideoSizeListener(mVideoListener);
+            this.mPlayer.removeVideoStateListener(mVideoListener);
         }
     }
 
-    protected class BasicVideoListener implements IVideoListener {
+    protected class BasicVideoListener implements IVideoStateListener, IVideoSizeListener {
         @Override
         @CallSuper
         public void onStateChanged(int oldState, int newState) {
@@ -602,12 +623,19 @@ public class BasicVideoView extends FrameLayout {
                     postDelayed(mOpenSurfaceRunnable, 500);
                     break;
             }
+            for (IVideoStateListener listener : mVideoStateListeners) {
+                listener.onStateChanged(oldState, newState);
+            }
         }
 
 
         @Override
+        @CallSuper
         public void onVolumeChanged(int startVolume, int finalVolume) {
             PlayerLog.d(TAG, "onVolumeChanged startVolume is " + startVolume + " , finalVolume is " + finalVolume);
+            for (IVideoStateListener listener : mVideoStateListeners) {
+                listener.onVolumeChanged(startVolume, finalVolume);
+            }
         }
 
         @Override

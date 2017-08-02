@@ -24,6 +24,7 @@ import com.vmovier.lib.player.IPlayer;
 import com.vmovier.lib.player.MediaError;
 import com.vmovier.lib.player.VideoViewDataSource;
 import com.vmovier.lib.utils.PlayerLog;
+import com.vmovier.lib.view.IVideoStateListener;
 import com.vmovier.lib.view.VMovieVideoView;
 
 import java.lang.ref.WeakReference;
@@ -134,7 +135,7 @@ public class VMovieVideoViewActivity extends AppCompatActivity implements Compou
                 mVMovieVideoView.setMediaDataSource(d);
             }
         }
-        mVMovieVideoView.addVMovieVideoViewListener(mVideoListener);
+        mVMovieVideoView.addVideoStateListener(mVideoListener);
         mVMovieVideoView.setOnGenerateGestureDetectorListener(new TestOnGenerateGestureDetectorListener());
 
         ArrayAdapter<String> urlsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, videoTitles);
@@ -178,7 +179,7 @@ public class VMovieVideoViewActivity extends AppCompatActivity implements Compou
         super.onDestroy();
         mainHandler.removeCallbacksAndMessages(null);
         mainHandler = null;
-        mVMovieVideoView.removeVMovieVideoViewListener(mVideoListener);
+        mVMovieVideoView.removeVideoStateListener(mVideoListener);
         mVMovieVideoView.stopPlayback();
         mVMovieVideoView = null;
     }
@@ -303,7 +304,7 @@ public class VMovieVideoViewActivity extends AppCompatActivity implements Compou
         }
     }
 
-    VMovieVideoView.IVMovieVideoViewListener mVideoListener = new VMovieVideoView.IVMovieVideoViewListener() {
+    IVideoStateListener mVideoListener = new IVideoStateListener() {
         @Override
         public void onStateChanged(int oldState, int newState) {
             String stateString = "";

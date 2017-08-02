@@ -7,7 +7,8 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import com.vmovier.lib.player.internal.IInternalPlayer;
-import com.vmovier.lib.view.IVideoListener;
+import com.vmovier.lib.view.IVideoStateListener;
+import com.vmovier.lib.view.IVideoSizeListener;
 
 
 /**
@@ -134,7 +135,11 @@ public interface IPlayer {
 
     void setSurface(Surface surface);
 
-    void addVideoListener(@NonNull IVideoListener listener);
+    void addVideoStateListener(@NonNull IVideoStateListener listener);
 
-    void removeVideoListener(@NonNull IVideoListener listener);
+    void removeVideoStateListener(@NonNull IVideoStateListener listener);
+
+    void addVideoSizeListener(@NonNull IVideoSizeListener listener);
+
+    void removeVideoSizeListener(@NonNull IVideoSizeListener listener);
 }

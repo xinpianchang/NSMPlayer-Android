@@ -23,7 +23,8 @@ import com.vmovier.lib.player.internal.IInternalPlayer;
 import com.vmovier.lib.player.internal.InternalPlayerFactory;
 import com.vmovier.lib.utils.ConnectionUtils;
 import com.vmovier.lib.utils.PlayerLog;
-import com.vmovier.lib.view.IVideoListener;
+import com.vmovier.lib.view.IVideoSizeListener;
+import com.vmovier.lib.view.IVideoStateListener;
 
 import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -49,7 +50,8 @@ class VMoviePlayer extends StateMachine implements IPlayer {
     private static final boolean DEBUG = true;
     private IInternalPlayer mInternalMediaPlayer;
     private final Context mAppContext;
-    private final CopyOnWriteArraySet<IVideoListener> listeners;
+    private final CopyOnWriteArraySet<IVideoStateListener> mVideoStateListeners;
+    private final CopyOnWriteArraySet<IVideoSizeListener> mVideoSizeListeners;
     private final Handler mMainHandler;
     private AudioManager mAudioManager;
     // Max 音量, 不同手机 有可能不同.
@@ -130,7 +132,9 @@ class VMoviePlayer extends StateMachine implements IPlayer {
 
         this.mAppContext = context.getApplicationContext();
         this.mMainHandler = new Handler(Looper.getMainLooper());
-        this.listeners = new CopyOnWriteArraySet<>();
+        this.mVideoStateListeners = new CopyOnWriteArraySet<>();
+        this.mVideoSizeListeners = new CopyOnWriteArraySet<>();
+
         initAudioManager();
         startStateMachine();
     }
@@ -478,19 +482,29 @@ class VMoviePlayer extends StateMachine implements IPlayer {
     }
 
     @Override
-    public void addVideoListener(@NonNull IVideoListener listener) {
-        if (listeners.size() == 0) {
+    public void addVideoStateListener(@NonNull IVideoStateListener listener) {
+        if (mVideoStateListeners.size() == 0) {
             startRegister();
         }
-        listeners.add(listener);
+        mVideoStateListeners.add(listener);
     }
 
     @Override
-    public void removeVideoListener(@NonNull IVideoListener listener) {
-        listeners.remove(listener);
-        if (listeners.size() == 0) {
+    public void removeVideoStateListener(@NonNull IVideoStateListener listener) {
+        mVideoStateListeners.remove(listener);
+        if (mVideoStateListeners.size() == 0) {
             stopResister();
         }
+    }
+
+    @Override
+    public void addVideoSizeListener(@NonNull IVideoSizeListener listener) {
+        mVideoSizeListeners.add(listener);
+    }
+
+    @Override
+    public void removeVideoSizeListener(@NonNull IVideoSizeListener listener) {
+        mVideoSizeListeners.remove(listener);
     }
 
     private void onPlayerVideoSizeChanged() {
@@ -505,7 +519,7 @@ class VMoviePlayer extends StateMachine implements IPlayer {
         @Override
         public void run() {
             PlayerLog.d(TAG, "VideoView 收到播放器进入 PREPARED or VideoSizeChanged 状态的信息 " );
-            for (IVideoListener listener : listeners) {
+            for (IVideoSizeListener listener : mVideoSizeListeners) {
                 listener.onVideoSizeChanged(VMoviePlayer.this, mVideoSize);
             }
         }
@@ -518,7 +532,7 @@ class VMoviePlayer extends StateMachine implements IPlayer {
                 PlayerLog.d(TAG, "LastState == mState, doNothing");
                 return;
             }
-            for (IVideoListener listener : listeners) {
+            for (IVideoStateListener listener : mVideoStateListeners) {
                 listener.onStateChanged(mLastState, mState);
             }
             mLastState = mState;
@@ -559,7 +573,7 @@ class VMoviePlayer extends StateMachine implements IPlayer {
                         mCurrentVolume = (int) (((float) audioCurrentVolume / (float) mAudioMaxVolume) * 100);
                     }
 
-                    for (IVideoListener listener : listeners) {
+                    for (IVideoStateListener listener : mVideoStateListeners) {
                         listener.onVolumeChanged(oldVolume, mCurrentVolume);
                     }
                 }
