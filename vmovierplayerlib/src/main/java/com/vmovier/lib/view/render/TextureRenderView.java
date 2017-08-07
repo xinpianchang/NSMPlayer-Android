@@ -246,7 +246,7 @@ public class TextureRenderView extends TextureView implements IRenderView {
             mIsFormatChanged = false;
             mWidth = 0;
             mHeight = 0;
-            surface.release();
+//            surface.release();
 
             ISurfaceHolder surfaceHolder = new InternalSurfaceHolder(mWeakRenderView.get(), surface);
             for (IRenderCallback renderCallback : mRenderCallbackMap.keySet()) {

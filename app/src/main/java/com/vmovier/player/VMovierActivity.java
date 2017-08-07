@@ -38,8 +38,7 @@ public class VMovierActivity extends AppCompatActivity {
         mSeekBar.setMax(1000);
         mSeekBar.setOnSeekBarChangeListener(mSeekBarChangeListener);
         mVMovieVideoView.setAutoPlay(true);
-        mVMovieVideoView.setPosterUrl("http://cs.vmoiver.com/Uploads/Magic/post/2016-12-05/584513723605e.jpg");
-        VideoViewDataSource dataSource = new VideoViewDataSource(Uri.parse("http://125.39.21.11/xdispatch/7ryl2t.com1.z0.glb.clouddn.com/5857c31897c89.mp4"));
+        VideoViewDataSource dataSource = new VideoViewDataSource(Uri.parse("http://vjs.zencdn.net/v/oceans.mp4"));
         mVMovieVideoView.setMediaDataSource(dataSource);
     }
 

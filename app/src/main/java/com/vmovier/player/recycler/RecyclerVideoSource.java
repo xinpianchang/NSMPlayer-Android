@@ -18,31 +18,31 @@ public class RecyclerVideoSource {
     public static ArrayList<RecyclerVideoSource> createSource() {
         ArrayList<RecyclerVideoSource> a = new ArrayList<>();
         RecyclerVideoSource r1 = new RecyclerVideoSource();
-        r1.videoViewDataSource = new VideoViewDataSource(Uri.parse("http://125.39.21.11/xdispatch/7ryl2t.com1.z0.glb.clouddn.com/5857c31897c89.mp4"));
+        r1.videoViewDataSource = new VideoViewDataSource(Uri.parse("http://vjs.zencdn.net/v/oceans.mp4"));
         a.add(r1);
 
         RecyclerVideoSource r2 = new RecyclerVideoSource();
-        r2.videoViewDataSource = new VideoViewDataSource(Uri.parse("http://125.39.21.11/xdispatch/7ryl2t.com1.z0.glb.clouddn.com/5857c31897c89.mp4"));
+        r2.videoViewDataSource = new VideoViewDataSource(Uri.parse("http://vjs.zencdn.net/v/oceans.mp4"));
         a.add(r2);
 
         RecyclerVideoSource r3 = new RecyclerVideoSource();
-        r3.videoViewDataSource = new VideoViewDataSource(Uri.parse("http://125.39.21.11/xdispatch/7ryl2t.com1.z0.glb.clouddn.com/5857c31897c89.mp4"));
+        r3.videoViewDataSource = new VideoViewDataSource(Uri.parse("http://vjs.zencdn.net/v/oceans.mp4"));
         a.add(r3);
 
         RecyclerVideoSource r4 = new RecyclerVideoSource();
-        r4.videoViewDataSource = new VideoViewDataSource(Uri.parse("http://125.39.21.11/xdispatch/7ryl2t.com1.z0.glb.clouddn.com/5857c31897c89.mp4"));
+        r4.videoViewDataSource = new VideoViewDataSource(Uri.parse("http://vjs.zencdn.net/v/oceans.mp4"));
         a.add(r4);
 
         RecyclerVideoSource r5 = new RecyclerVideoSource();
-        r5.videoViewDataSource = new VideoViewDataSource(Uri.parse("http://125.39.21.11/xdispatch/7ryl2t.com1.z0.glb.clouddn.com/5857c31897c89.mp4"));
+        r5.videoViewDataSource = new VideoViewDataSource(Uri.parse("http://vjs.zencdn.net/v/oceans.mp4"));
         a.add(r5);
 
         RecyclerVideoSource r6 = new RecyclerVideoSource();
-        r6.videoViewDataSource = new VideoViewDataSource(Uri.parse("http://125.39.21.11/xdispatch/7ryl2t.com1.z0.glb.clouddn.com/5857c31897c89.mp4"));
+        r6.videoViewDataSource = new VideoViewDataSource(Uri.parse("http://vjs.zencdn.net/v/oceans.mp4"));
         a.add(r6);
 
         RecyclerVideoSource r7 = new RecyclerVideoSource();
-        r7.videoViewDataSource = new VideoViewDataSource(Uri.parse("http://125.39.21.11/xdispatch/7ryl2t.com1.z0.glb.clouddn.com/5857c31897c89.mp4"));
+        r7.videoViewDataSource = new VideoViewDataSource(Uri.parse("http://vjs.zencdn.net/v/oceans.mp4"));
         a.add(r7);
 
 

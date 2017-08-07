@@ -130,7 +130,6 @@ public class VMovieVideoViewActivity extends AppCompatActivity implements Compou
             mVMovieVideoView.setMuted(isMuted);
             mVMovieVideoView.setLoop(isLoop);
             mVMovieVideoView.setAllowMeteredNetwork(allow);
-            mVMovieVideoView.setPosterUrl("http://cs.vmoiver.com/Uploads/Magic/post/2016-12-05/584513723605e.jpg");
             if (d != null) {
                 mVMovieVideoView.setMediaDataSource(d);
             }

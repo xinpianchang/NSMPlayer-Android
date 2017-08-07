@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.vmovier.lib.player.IPlayer;
 import com.vmovier.lib.player.IPlayerFactory;
 import com.vmovier.lib.player.VideoViewDataSource;
 import com.vmovier.lib.view.BasicVideoView;
+import com.vmovier.lib.view.IVideoStateListener;
 
 import java.util.ArrayList;
 
@@ -23,6 +25,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class EssayDetailActivity extends AppCompatActivity implements EssayAdapter.OnVideoDetailClickListener, View.OnClickListener {
+    private static final String TAG = EssayDetailActivity.class.getSimpleName();
     @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
     private ArrayList<EssayBean> data;
@@ -40,6 +43,17 @@ public class EssayDetailActivity extends AppCompatActivity implements EssayAdapt
         mPlayer = IPlayerFactory.newInstance(this);
         mPlayer.setPlayerType(IPlayer.PLAYERTYPE_EXO);
         mPlayer.setAutoPlay(true);
+        mPlayer.addVideoStateListener(new IVideoStateListener() {
+            @Override
+            public void onStateChanged(int oldState, int newState) {
+                Log.d(TAG, "newState :" + newState);
+            }
+
+            @Override
+            public void onVolumeChanged(int startVolume, int finalVolume) {
+
+            }
+        });
 
         data = makeDatas();
         mEssayAdapter = new EssayAdapter(data);
@@ -72,13 +86,11 @@ public class EssayDetailActivity extends AppCompatActivity implements EssayAdapt
 
         EssayBean image = new EssayBean();
         image.viewType = EssayAdapter.IMAGE;
-        image.imageUrl = "http://cs.vmoiver.com/Uploads/cover/2017-07-07/595f5aa650e81_cut.jpeg";
         data.add(image);
 
         EssayBean video1 = new EssayBean();
         video1.viewType = EssayAdapter.VIDEO;
-        video1.postUrl = "http://cs.vmoiver.com/Uploads/cover/2017-07-04/595b434b57f1c_cut.jpeg";
-        video1.videoUrl = "http://125.39.21.11/xdispatch/7ryl2t.com1.z0.glb.clouddn.com/5857c31897c89.mp4";
+        video1.videoUrl = "http://vjs.zencdn.net/v/oceans.mp4";
         data.add(video1);
 
 
@@ -95,7 +107,6 @@ public class EssayDetailActivity extends AppCompatActivity implements EssayAdapt
 
         EssayBean video2 = new EssayBean();
         video2.viewType = EssayAdapter.VIDEO;
-        video2.postUrl = "http://cs.vmoiver.com/Uploads/cover/2017-07-05/595c7bdb56ee5_cut.jpeg";
         video2.videoUrl = "http://vjs.zencdn.net/v/oceans.mp4";
         data.add(video2);
         return data;
@@ -137,6 +148,7 @@ public class EssayDetailActivity extends AppCompatActivity implements EssayAdapt
         lp.gravity = Gravity.CENTER;
         frameLayout.addView(newBasicVideoView, lp);
         vp.addView(frameLayout, lpParent);
+        mPlayer.seekTo(mPlayer.getCurrentPosition() - 20);
     }
 
     @Override
@@ -154,6 +166,7 @@ public class EssayDetailActivity extends AppCompatActivity implements EssayAdapt
                 if (mLastPlayViewHolder != null) {
                     mLastPlayViewHolder.basicVideoView.setPlayer(mPlayer);
                 }
+                mPlayer.seekTo(mPlayer.getCurrentPosition() - 20);
                 break;
         }
     }
