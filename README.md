@@ -37,7 +37,7 @@ allprojects {
 }
 
 dependencies {
-    compile 'com.vmovier.libs:player:2.2.5' 
+    compile 'com.vmovier.libs:player:2.3.5' 
 }
 ```
 
@@ -87,6 +87,7 @@ PlayerState 图如下:
     android:id="@+id/VMovieVideoView"
     app:playerType="exo_MediaPlayer" // 播放器类型 可选选项: 1 exo_MediaPlayer 2 android_MediaPlayer
     app:needShowPosterView="true" // 是否显示海报 可选选项: 1 true 2 false
+    app:renderViewType="render_surface_view" //渲染View的类型 1 render_surface_view 2 render_texture_view
     app:scaleType="scale_fit_parent" // 影片渲染的比例 可选选项: 1 scale_fit_parent 2 scale_fill_parent 3 scale_wrap_content 4  scale_match_parent 5 scale_16_9_fit_parent 6 scale_4_3_fit_parent
     app:muted="false"   // 是否静音 可选选项: 1 true 2 false
     app:loop="false"    // 是否循环播放 可选选项: 1 true 2 false
@@ -94,9 +95,9 @@ PlayerState 图如下:
     app:useController="true"    // 是否使用 ControllerView 可选选项: 1 true 2 false
     app:controllerShowTimeoutMs="3000" // ControllerView 显示的时间
     app:defaultControlViewMode="portrait_inset" // ControllerView 的Mode 可选选项: 1 portrait_inset 竖屏小屏 2 portrait_fullscreen 竖屏全屏 3 landscape_fullscreen 横屏全屏 三种模式
-    app:portraitFullScreenViewControllerLayoutId="@layout/activity_portrait_video" // 竖屏全屏下你的自定义 ControllerView 的布局
-    app:portraitInsetViewControllerLayoutId="@layout/activity_portrait_video"   // 竖屏小屏下你的自定义 ControllerView 布局
-    app:LandScapeViewControllerLayoutId="@layout/activity_portrait_video" // 横屏全屏下你的自定义 ControllerView 布局
+    app:landscapeViewControllerLayoutId="@layout/videoplayer_landscape_control" // 横屏全屏下你的自定义 ControllerView 布局
+    app:portraitFullScreenViewControllerLayoutId="@layout/videoplayer_portrait_fullscreen_control" // 竖屏全屏下你的自定义 ControllerView 的布局
+    app:portraitInsetViewControllerLayoutId="@layout/videoplayer_portrait_inset_control" // 竖屏小屏下你的自定义 ControllerView 布局
     android:layout_width="match_parent"
     android:layout_height="match_parent"/>
 ```
@@ -107,6 +108,7 @@ mVMovieVideoView.setNeedShowPosterView(true); // 是否显示海报
 mVMovieVideoView.setMuted(isMuted); // 是否静音
 mVMovieVideoView.setLoop(isLoop); // 是否循环播放
 mVMovieVideoView.setAutoPlay(true);  // 是否自动播放
+mVMovieVideoView.setRenderType(1); //设置渲染类型
 mVMovieVideoView.setAllowMeteredNetwork(allow); // 设置是否允许移动网络播放
 mVMovieVideoView.setScreenMode(BasicVideoView.PLAYERSCREENMODE_PORTRAIT_INSET);// ControllerView 的 Mode 分为竖屏小屏 竖屏全屏 横屏全屏三种模式
 mVMovieVideoView.setVolume(0-100); // 设置音量
@@ -119,7 +121,7 @@ mVMovieVideoView.setMediaDataSource(d); // 如果你设置了AutoPlay 为true �
 #### 监听播放器的状态变化
 
 ```Java
-mVMovieVideoView.setVMovieVideoViewListener(new VMovieVideoView.IVMovieVideoViewListener() {
+mVMovieVideoView.addVideoStateListener(new IVideoStateListener() {
     @Override
     public void onStateChanged(int oldState, int newState){
         // 播放状态发生改变后会回调该方法，oldState 为之前的状态，newState 为当前状态。
@@ -154,7 +156,7 @@ mVMovieVideoView.setAllowMeteredNetwork(true);
 ```
 否则的话播放器在 3G/4G 网络下是无法进行播放的，并且播放器会把这个事件作为一个 Error 事件汇报给你， 你可以这样去监听到这个行为
 ```Java
-mVMovieVideoView.setVMovieVideoViewListener(new  new VMovieVideoView.IVMovieVideoViewListener() {
+mVMovieVideoView.addVideoStateListener(new IVideoStateListener() {
     @Override
     public void onStateChanged(int oldState, int newState) {
         // 播放状态发生改变后会回调该方法, oldState 为之前的状态, newState 为当前状态
