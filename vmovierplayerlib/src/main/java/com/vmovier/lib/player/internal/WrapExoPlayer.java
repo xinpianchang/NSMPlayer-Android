@@ -12,6 +12,7 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
@@ -334,8 +335,18 @@ class WrapExoPlayer extends AbstractPlayer {
         }
     }
 
-    private class ExoEventListener implements ExoPlayer.EventListener {
+    private class ExoEventListener implements Player.EventListener {
         private boolean isBuffering = false;
+
+        /**
+         * Called when the value of {@link Player#getRepeatMode()} changes.
+         *
+         * @param repeatMode The {@link Player.RepeatMode} used for playback.
+         */
+        @Override
+        public void onRepeatModeChanged(int repeatMode) {
+            PlayerLog.d(TAG, "onRepeatModeChanged is " + repeatMode);
+        }
 
         /**
          * Called when the player starts or stops loading the source.
