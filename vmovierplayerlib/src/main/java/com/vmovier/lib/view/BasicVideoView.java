@@ -89,6 +89,7 @@ public class BasicVideoView extends FrameLayout {
     protected OnGenerateGestureDetectorListener mOnGenerateGestureDetectorListener;
 
     private CopyOnWriteArraySet<IVideoStateListener> mVideoStateListeners = new CopyOnWriteArraySet<>();
+    private CopyOnWriteArraySet<IVideoSizeListener> mVideoSizeListeners = new CopyOnWriteArraySet<>();
 
     public BasicVideoView(Context context) {
         this(context, null);
@@ -344,6 +345,14 @@ public class BasicVideoView extends FrameLayout {
 
     public void removeVideoStateListener(@NonNull IVideoStateListener listener) {
         mVideoStateListeners.remove(listener);
+    }
+
+    public void addVideoSizeListener(@NonNull IVideoSizeListener listener) {
+        mVideoSizeListeners.add(listener);
+    }
+
+    public void removeVideoSizeListener(@NonNull IVideoSizeListener listener) {
+        mVideoSizeListeners.remove(listener);
     }
 
     public int getScaleType() {
@@ -640,13 +649,18 @@ public class BasicVideoView extends FrameLayout {
 
         @Override
         @CallSuper
-        public void onVideoSizeChanged(IPlayer mp, VideoSize videoSize) {
+        public void onVideoSizeChanged(VideoSize videoSize) {
+            PlayerLog.d(TAG, "onVideoSizeChanged : " + videoSize.toString());
             mVideoSize = videoSize;
             if (mVideoSize.videoWidth  != 0 && mVideoSize.videoHeight != 0) {
                 if (mRenderView != null) {
                     mRenderView.setVideoSize(mVideoSize.videoWidth, mVideoSize.videoHeight);
                     mRenderView.setVideoSampleAspectRatio(mVideoSize.videoSarNum, mVideoSize.videoSarDen);
                 }
+            }
+
+            for (IVideoSizeListener listener : mVideoSizeListeners) {
+                listener.onVideoSizeChanged(videoSize);
             }
         }
     }

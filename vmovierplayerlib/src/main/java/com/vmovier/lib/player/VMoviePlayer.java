@@ -520,7 +520,7 @@ class VMoviePlayer extends StateMachine implements IPlayer {
         public void run() {
             PlayerLog.d(TAG, "VideoView 收到播放器进入 PREPARED or VideoSizeChanged 状态的信息 " );
             for (IVideoSizeListener listener : mVideoSizeListeners) {
-                listener.onVideoSizeChanged(VMoviePlayer.this, mVideoSize);
+                listener.onVideoSizeChanged(mVideoSize);
             }
         }
     };
