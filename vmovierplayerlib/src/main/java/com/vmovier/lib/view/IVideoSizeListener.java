@@ -1,5 +1,7 @@
 package com.vmovier.lib.view;
 
+import android.support.annotation.NonNull;
+
 import com.vmovier.lib.player.VideoSize;
 
 /**
@@ -10,5 +12,5 @@ public interface IVideoSizeListener {
      * VideoSize发生改变之后,回调该方法
      * @param videoSize 视频Size
      */
-    void onVideoSizeChanged(VideoSize videoSize);
+    void onVideoSizeChanged(@NonNull VideoSize videoSize);
 }

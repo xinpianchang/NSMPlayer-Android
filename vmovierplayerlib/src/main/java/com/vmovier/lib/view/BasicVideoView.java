@@ -649,7 +649,7 @@ public class BasicVideoView extends FrameLayout {
 
         @Override
         @CallSuper
-        public void onVideoSizeChanged(VideoSize videoSize) {
+        public void onVideoSizeChanged(@NonNull VideoSize videoSize) {
             PlayerLog.d(TAG, "onVideoSizeChanged : " + videoSize.toString());
             mVideoSize = videoSize;
             if (mVideoSize.videoWidth  != 0 && mVideoSize.videoHeight != 0) {
