@@ -44,16 +44,16 @@
             android:layout_height="40dp" />
     </LinearLayout>
 
-    <SeekBar
-        android:id="@+id/VolumeSeekBar"
-        android:layout_width="match_parent"
-        android:layout_height="24dp"
+    <com.vmovier.lib.view.VMovierTimeBar
+        android:id="@+id/timeBar"
+        app:bar_height="2dp"
         android:layout_below="@+id/VMovieVideoView"
-        android:layout_marginTop="-13dp"
-        android:maxHeight="2dp"
-        android:minHeight="2dp"
-        android:progressDrawable="@drawable/videoplayer_seekbar_progress"
-        android:splitTrack="false"
-        android:thumbOffset="2dp"
-        android:thumb="@drawable/videoplayer_timeline_circle" />
+        android:layout_marginTop="-11dp"
+        app:unplayed_color="@android:color/holo_orange_light"
+        app:scrubber_color="@android:color/holo_blue_bright"
+        app:played_color="@android:color/holo_red_dark"
+        app:buffered_color="@android:color/holo_green_dark"
+        app:ad_marker_color="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="20dp" />
 </RelativeLayout>

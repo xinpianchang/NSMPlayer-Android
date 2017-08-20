@@ -433,10 +433,11 @@ class VMoviePlayer extends StateMachine implements IPlayer {
     // 在Preparing State 下调用源生播放器的getDuration 会报出 Attempt to call getDuration without a valid mediaplayer错误.
     @Override
     public long getDuration() {
-        if (isCurrentState(STATE_MASK_PREPARED)) {
-            return mInternalMediaPlayer == null ? 0 : mInternalMediaPlayer.getDuration();
+        long duration = 0;
+        if (isCurrentState(STATE_MASK_PREPARED) && mInternalMediaPlayer != null) {
+            duration = mInternalMediaPlayer.getDuration();
         }
-        return 0;
+        return duration < 0 ? 0 : duration;
     }
 
     @Override

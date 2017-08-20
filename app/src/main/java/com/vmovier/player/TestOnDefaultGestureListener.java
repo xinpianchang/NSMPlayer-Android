@@ -3,8 +3,8 @@ package com.vmovier.player;
 import android.view.MotionEvent;
 
 import com.vmovier.lib.player.IPlayer;
-import com.vmovier.lib.view.OnDefaultGestureListener;
 import com.vmovier.lib.view.IPlayerControlView;
+import com.vmovier.lib.view.OnDefaultGestureListener;
 
 /**
  * Created by bb on 2017/5/5.

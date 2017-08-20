@@ -1,27 +1,30 @@
 package com.vmovier.player;
 
-import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
-import android.widget.SeekBar;
 
 import com.magicbox.vmovierplayer.R;
+import com.vmovier.lib.player.IPlayer;
 import com.vmovier.lib.player.VideoViewDataSource;
+import com.vmovier.lib.view.IVideoStateListener;
 import com.vmovier.lib.view.VMovieVideoView;
+import com.vmovier.lib.view.VMovierTimeBar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.magicbox.vmovierplayer.R.id.timeBar;
+
 
 public class VMovierActivity extends AppCompatActivity {
 
-    @BindView(R.id.VolumeSeekBar)
-    SeekBar mSeekBar;
+    @BindView(timeBar)
+    VMovierTimeBar mSeekBar;
 
     @BindView(R.id.VMovieVideoView)
     VMovieVideoView mVMovieVideoView;
@@ -29,53 +32,87 @@ public class VMovierActivity extends AppCompatActivity {
     @BindView(R.id.image)
     ImageView mImageView;
 
+    boolean isVideoReady = false;
+
+    Runnable updateProgressRunnable = new Runnable() {
+        @Override
+        public void run() {
+            updateProgress();
+        }
+    };
+
+    Runnable shotscreenRunnable = new Runnable() {
+        @Override
+        public void run() {
+            screenShot();
+        }
+    };
+
+    Handler mHandler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vmovier);
         ButterKnife.bind(this);
-        mSeekBar.setPadding(0, 0, 0, 0);
-        mSeekBar.setMax(1000);
-        mSeekBar.setOnSeekBarChangeListener(mSeekBarChangeListener);
+        mHandler = new Handler();
         mVMovieVideoView.setAutoPlay(true);
-        VideoViewDataSource dataSource = new VideoViewDataSource(Uri.parse("http://vjs.zencdn.net/v/oceans.mp4"));
+        // http://vjs.zencdn.net/v/oceans.mp4
+        VideoViewDataSource dataSource = new VideoViewDataSource(Uri.parse("https://cdn-video.xinpianchang.com/5984533f8c2ef.mp4"));
         mVMovieVideoView.setMediaDataSource(dataSource);
+        mVMovieVideoView.addVideoStateListener(new IVideoStateListener() {
+            @Override
+            public void onStateChanged(int oldState, int newState) {
+                updateProgress();
+                switch (newState) {
+                    case IPlayer.STATE_PLAYING:
+                    case IPlayer.STATE_PAUSING:
+                        if (!isVideoReady) {
+                            isVideoReady = true;
+                            mSeekBar.setDuration(mVMovieVideoView.getDuration());
+                        }
+                        break;
+                }
+            }
+
+            @Override
+            public void onVolumeChanged(int startVolume, int finalVolume) {
+
+            }
+        });
+        mSeekBar.setListener(new VMovierTimeBar.OnScrubListener() {
+            @Override
+            public void onScrubStart(VMovierTimeBar timeBar, long position) {
+
+            }
+
+            @Override
+            public void onScrubMove(VMovierTimeBar timeBar, long position) {
+
+            }
+
+            @Override
+            public void onScrubStop(VMovierTimeBar timeBar, long position, boolean canceled) {
+                mVMovieVideoView.seekTo(position);
+            }
+        });
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mHandler.removeCallbacksAndMessages(null);
         mVMovieVideoView.stopPlayback();
     }
 
     @OnClick(R.id.hide)
     void hide() {
-        ObjectAnimator animator = null;
-        Object tag = mSeekBar.getTag(R.id.progress_animation);
-        if (tag != null) {
-            animator = (ObjectAnimator) tag;
-            animator.cancel();
-        }
-        animator = ObjectAnimator.ofInt(mSeekBar.getThumb(), "alpha", 0);
-        animator.setDuration(200);
-        animator.setInterpolator(new DecelerateInterpolator());
-        animator.start();
-        mSeekBar.setTag(R.id.progress_animation, animator);
+        mSeekBar.hideThumb();
     }
 
     @OnClick(R.id.show)
     void show() {
-        ObjectAnimator animator = null;
-        Object tag = mSeekBar.getTag(R.id.progress_animation);
-        if (tag != null) {
-            animator = (ObjectAnimator) tag;
-            animator.cancel();
-        }
-        animator = ObjectAnimator.ofInt(mSeekBar.getThumb(), "alpha", 255);
-        animator.setDuration(200);
-        animator.setInterpolator(new DecelerateInterpolator());
-        animator.start();
-        mSeekBar.setTag(R.id.progress_animation, animator);
+        mSeekBar.showThumb();
     }
 
     @OnClick(R.id.screenShot)
@@ -84,33 +121,21 @@ public class VMovierActivity extends AppCompatActivity {
         if (bitmap != null) {
             mImageView.setImageBitmap(bitmap);
         }
+        mHandler.postDelayed(shotscreenRunnable, 20);
     }
 
-    private boolean isTrackingTouch = false;
-
-    private SeekBar.OnSeekBarChangeListener mSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            if (!fromUser) return;
-            long duration = mVMovieVideoView.getDuration();
-            long newPosition = (duration * progress) / 1000L;
-            // 如果duration 为0, 则记录1下 seek的比例
-            mVMovieVideoView.seekTo(newPosition);
+    private void updateProgress() {
+        long duration = mVMovieVideoView == null ? 0 : mVMovieVideoView.getDuration();
+        long position = mVMovieVideoView == null ? 0 : mVMovieVideoView.getCurrentPosition();
+        int bufferPercentage = mVMovieVideoView == null ? 0 : mVMovieVideoView.getBufferPercentage();
+        mSeekBar.setPosition(position);
+        mSeekBar.setBufferedPosition(bufferPercentage);
+        mSeekBar.setDuration(duration);
+        mHandler.removeCallbacks(updateProgressRunnable);
+        // Schedule an update if necessary.
+        int playState = mVMovieVideoView == null ? IPlayer.STATE_IDLE : mVMovieVideoView.getCurrentPlayerState();
+        if (playState == IPlayer.STATE_PLAYING) {
+            mHandler.postDelayed(updateProgressRunnable, 1000);
         }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-            isTrackingTouch = true;
-            mVMovieVideoView.setControllerShowTimeoutMs(0);
-            mVMovieVideoView.showController();
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-            isTrackingTouch = false;
-            mVMovieVideoView.setControllerShowTimeoutMs(5000);
-            mVMovieVideoView.showController();
-        }
-    };
-
+    }
 }

@@ -131,7 +131,8 @@ public class OnDefaultGestureListener extends GestureDetector.SimpleOnGestureLis
         }
         float mXCoordinateWhenActionDown = e.getRawX();
 
-        if (mDurationWhenActionDown == 0) {
+        if (mDurationWhenActionDown <= 0) {
+            mDurationWhenActionDown = 0;
             mDragSeekHelper = null;
         } else {
             mDragSeekHelper = new DefaultSeekHelper(mDurationWhenActionDown, 0,

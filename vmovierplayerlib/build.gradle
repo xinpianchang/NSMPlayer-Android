@@ -16,7 +16,7 @@ def password = project.hasProperty('password') ? project.property('password') : 
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '25.0.3'
 
     defaultConfig {
         minSdkVersion 19
@@ -37,7 +37,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.google.android.exoplayer:exoplayer:r2.5.1'
     compile "com.android.support:appcompat-v7:$googleSupportVersion"
     compile "com.github.bumptech.glide:glide:$glideSupportVersion"
