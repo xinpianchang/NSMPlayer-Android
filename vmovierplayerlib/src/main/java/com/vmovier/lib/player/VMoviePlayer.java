@@ -86,7 +86,6 @@ class VMoviePlayer extends StateMachine implements IPlayer {
     private volatile VideoSize mVideoSize = new VideoSize();
     private volatile Surface mSurface;
 
-    // 暂存需要restore的 Bundle, 在调用restoreInstanceState 之后 赋值.在成功恢复到相应的状态以后 置空.
     // 在调用saveInstanceState的时候, 如果该值不为空 说明还在恢复状态过程中,那么直接返回该值.
     private final AtomicReference<Bundle> mAtomicRestoreBundle = new AtomicReference<>();
     private volatile MediaError mMediaError = null;
@@ -181,7 +180,6 @@ class VMoviePlayer extends StateMachine implements IPlayer {
     public void play() {
         sendMessage(CMD_PLAY);
         targetPlay = true;
-        // TODO EXOPlayer 播放的时候 check Surface 是否改变过. 如果改变过需要seek下.
     }
 
     @Override
@@ -842,8 +840,7 @@ class VMoviePlayer extends StateMachine implements IPlayer {
                             pLog("现在是移动网络并且用户不同意在这种情况下播放");
                             MediaError error = new MediaError(MediaError.ERROR_METERED_NETWORK);
                             error.setRestoreBundle(saveState());
-                            mLastState = STATE_PREPARING;
-                            // 这样做是因为线程问题,EventBus还没有把PLAYEREVENT_PREPARING的信息送到,mLastState还是上次的Error状态. 但是其实已经应该是Preparing状态了
+                            mLastState = STATE_PREPARING; // FIXME 历史问题 感觉找时间可以去掉
                             sendMessage(EVENT_ERROR, error);
                             pLog("mLastState is " + mLastState + " , State is " + mState);
                         } else {
@@ -938,18 +935,6 @@ class VMoviePlayer extends StateMachine implements IPlayer {
                 case EVENT_UPDATE_SURFACE:
                     if (mInternalMediaPlayer != null) {
                         mInternalMediaPlayer.setSurface(mSurface);
-//                        if (mPlayerType == PLAYERTYPE_EXO && mSurface != null) {
-//                            //FIXME WorkAround, 解决ExoPlayer change RenderView的时候 有可能出现的黑屏现象.
-//                            long duration = mInternalMediaPlayer.getDuration();
-//                            long position = mInternalMediaPlayer.getCurrentPosition();
-//                            if (duration > 0) {
-//                                if (position - 20 >= 0) {
-//                                    mInternalMediaPlayer.seekTo(position - 20);
-//                                } else if (position + 20 < duration) {
-//                                    mInternalMediaPlayer.seekTo(duration + 20);
-//                                }
-//                            }
-//                        }
                     }
                     return HANDLED;
                 case EVENT_BUFFER_START:
@@ -971,7 +956,6 @@ class VMoviePlayer extends StateMachine implements IPlayer {
                     sendMessage(EVENT_TRY_TO_PREPARE);
                     return HANDLED;
                 case EVENT_CHECK_ALLOW_METEREDNETWORK: // 网络发生变化
-                    // FIXME. 如果是播放完成状态 收到变化 也发生响应 是否不合理?
                     if (needCareMeteredNetwork()) {
                         MediaError error = new MediaError(MediaError.ERROR_METERED_NETWORK);
                         error.setRestoreBundle(saveState());
@@ -1086,9 +1070,16 @@ class VMoviePlayer extends StateMachine implements IPlayer {
         public boolean processMessage(Message msg) {
             switch (msg.what) {
                 case CMD_PLAY:
-                    transitionTo(mPlayingState);
-                    if (mInternalMediaPlayer != null) {
-                        mInternalMediaPlayer.start();
+                    if (needCareMeteredNetwork()) {
+                        MediaError error = new MediaError(MediaError.ERROR_METERED_NETWORK);
+                        error.setRestoreBundle(saveState());
+                        release();
+                        sendMessage(EVENT_ERROR, error);
+                    } else {
+                        transitionTo(mPlayingState);
+                        if (mInternalMediaPlayer != null) {
+                            mInternalMediaPlayer.start();
+                        }
                     }
                     return HANDLED;
                 case EVENT_UPDATE_ISLOOP:
@@ -1100,6 +1091,9 @@ class VMoviePlayer extends StateMachine implements IPlayer {
                     }
                     return HANDLED;
                 case EVENT_UPDATE_BUFFERING:
+                    return HANDLED;
+                case EVENT_CHECK_ALLOW_METEREDNETWORK:
+                    // completed状态下收到网络改变信息 什么都不做
                     return HANDLED;
             }
             return NOT_HANDLED;
@@ -1164,7 +1158,9 @@ class VMoviePlayer extends StateMachine implements IPlayer {
             mInternalMediaPlayer.setOnSeekCompleteListener(null);
             mInternalMediaPlayer = null;
             AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
-            am.abandonAudioFocus(null);
+            if (am != null) {
+                am.abandonAudioFocus(null);
+            }
         }
     }
 

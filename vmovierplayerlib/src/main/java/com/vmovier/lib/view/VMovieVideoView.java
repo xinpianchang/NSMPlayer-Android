@@ -214,6 +214,14 @@ public class VMovieVideoView extends BasicVideoView {
             if (mErrorVideoStateBundle != null && mPlayer.getMediaError() != null && mPlayer.getMediaError().getErrorCode() == MediaError.ERROR_METERED_NETWORK) {
                 PlayerLog.d(TAG, "setAllowMeteredNetwork 开始恢复播放器");
                 mErrorVideoStateBundle.putBoolean(IPlayer.SAVE_ALLOWMETEREDNETWORK, true);
+                if (mErrorVideoStateBundle.containsKey(IPlayer.SAVE_STATE)) {
+                    int state = mErrorVideoStateBundle.getInt(IPlayer.SAVE_STATE);
+                    // 如果出错之前是 Completed状态, 则恢复到PlayingState.
+                    if (state == IPlayer.STATE_COMPLETED) {
+                        mErrorVideoStateBundle.putInt(IPlayer.SAVE_STATE, IPlayer.STATE_PLAYING);
+                        mErrorVideoStateBundle.putBoolean(IPlayer.SAVE_TARGET_PLAY, true);
+                    }
+                }
                 mPlayer.restoreState(mErrorVideoStateBundle);
                 mErrorVideoStateBundle = null;
             }
