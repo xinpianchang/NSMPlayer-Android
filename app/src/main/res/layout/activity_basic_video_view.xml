@@ -13,6 +13,7 @@
             android:id="@+id/BasicVideoView"
             app:needShowPosterView="true"
             app:useController="true"
+            app:renderViewType="render_texture_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
         <ProgressBar
@@ -218,6 +219,14 @@
         <TextView
             android:id="@+id/stopPlayback"
             android:text="销毁播放器"
+            android:background="@drawable/touch_selector"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/goOther"
+            android:text="去别的页面"
             android:background="@drawable/touch_selector"
             android:gravity="center"
             android:layout_weight="1"

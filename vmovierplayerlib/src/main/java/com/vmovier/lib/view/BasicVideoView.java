@@ -265,7 +265,7 @@ public class BasicVideoView extends FrameLayout {
                 return;
             }
             mSurfaceHolder = null;
-            bindSurfaceHolder(mPlayer, holder);
+            bindSurfaceHolder(mPlayer, null);
         }
     };
 
@@ -282,14 +282,20 @@ public class BasicVideoView extends FrameLayout {
     }
 
     private void openSurfaceViewContent() {
-        if (mRenderView != null) {
+        if (mRenderView == null) return;
+        if (Build.VERSION.SDK_INT >= 24 && mRenderView instanceof TextureRenderView) {
+            // do nothing targetVersion >= 24 TextureView doesn't support displaying a background drawable
+        } else {
             View view = mRenderView.getView();
             view.setBackgroundColor(0x00000000);
         }
     }
 
     private void closeSurfaceViewContent() {
-        if (mRenderView != null) {
+        if (mRenderView == null) return;
+        if (Build.VERSION.SDK_INT >= 24 && mRenderView instanceof TextureRenderView) {
+            // do nothing targetVersion >= 24 TextureView doesn't support displaying a background drawable
+        } else {
             View view = mRenderView.getView();
             view.setBackgroundColor(0xFF000000);
         }

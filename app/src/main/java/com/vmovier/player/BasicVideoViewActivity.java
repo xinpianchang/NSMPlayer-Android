@@ -1,5 +1,6 @@
 package com.vmovier.player;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -237,6 +238,10 @@ public class BasicVideoViewActivity extends AppCompatActivity implements Compoun
         mPlayer.pause();
     }
 
+    @OnClick(R.id.goOther)
+    void goOther() {
+        startActivity(new Intent(BasicVideoViewActivity.this, VMovierActivity.class));
+    }
 
     @OnClick(R.id.bindView)
     void bindView() {

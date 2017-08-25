@@ -369,26 +369,46 @@ class VMoviePlayer extends StateMachine implements IPlayer {
             b = tmpRestoreBundle;
         } else {
             b = new Bundle();
-            if (mState == STATE_PREPARING || mState == STATE_BUFFERING || mState == STATE_MASK_PAUSED ||
-                    mState == STATE_MASK_PLAYED || mState == STATE_MASK_PREPARED){
-                b.putInt(SAVE_STATE, targetPlay ? STATE_PLAYING : STATE_PAUSING);
-                pLog("saveInstanceState 时发现当前状态是过渡态: " + mState + " , 根据targetPlay来决定真正存储的是" +
-                        (targetPlay ? "STATE_PLAYING" : "STATE_PAUSING") + "状态");
-            } else {
-                b.putInt(SAVE_STATE, mState);
+            // 确定后续希望恢复到的状态
+            switch (mState) {
+                case STATE_PREPARING:
+                case STATE_BUFFERING:
+                case STATE_MASK_PAUSED:
+                case STATE_MASK_PLAYED:
+                case STATE_MASK_PREPARED:
+                    // 这些都是过渡态, 根据targetPlay来决定
+                    b.putInt(SAVE_STATE, targetPlay ? STATE_PLAYING : STATE_PAUSING);
+                    break;
+                case STATE_COMPLETED:
+                    // completed下有一种特殊情况 是不需要存储complete的
+                    if (mMediaError != null && mMediaError.getErrorCode() == MediaError.ERROR_METERED_NETWORK) {
+                        b.putInt(SAVE_STATE, STATE_PLAYING);
+                        b.putBoolean(SAVE_TARGET_PLAY, true);
+                    } else {
+                        b.putInt(SAVE_STATE, STATE_COMPLETED);
+                        b.putBoolean(SAVE_TARGET_PLAY, false);
+                    }
+                    break;
+                default:
+                    b.putInt(SAVE_STATE, mState);
+                    break;
             }
-            if (mState == STATE_COMPLETED) {
-                b.putBoolean(SAVE_TARGET_PLAY, false);
-                b.putLong(SAVE_POSITION, 0);
-            } else if (mState == STATE_ERROR){
-                b.putBoolean(SAVE_TARGET_PLAY, targetPlay);
-                b.putLong(SAVE_POSITION, getCurrentPosition());
-                b.putParcelable(SAVE_ERROR, mMediaError);
-            } else {
-                b.putBoolean(SAVE_TARGET_PLAY, targetPlay);
-                b.putLong(SAVE_POSITION, getCurrentPosition());
+            // 存储Position 以及各个状态特殊的一些状态
+            switch (mState) {
+                case STATE_COMPLETED:
+                    b.putLong(SAVE_POSITION, 0);
+                    break;
+                case STATE_ERROR:
+                    b.putBoolean(SAVE_TARGET_PLAY, targetPlay);
+                    b.putLong(SAVE_POSITION, getCurrentPosition());
+                    b.putParcelable(SAVE_ERROR, mMediaError);
+                    break;
+                default:
+                    b.putBoolean(SAVE_TARGET_PLAY, targetPlay);
+                    b.putLong(SAVE_POSITION, getCurrentPosition());
+                    break;
             }
-
+            // 存储所有状态都有的东西.
             b.putParcelable(SAVE_SOURCE, mMediaDataSource);
             b.putInt(SAVE_PLAYER_TYPE, mPlayerType);
             b.putBoolean(SAVE_AUTOPLAY, isAutoPlay);
@@ -589,7 +609,7 @@ class VMoviePlayer extends StateMachine implements IPlayer {
             // Normal mode will be audible and may vibrate according to user settings.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 NotificationManager n  = (NotificationManager) mAppContext.getSystemService(Context.NOTIFICATION_SERVICE);
-                boolean isPolicyGranted = n.isNotificationPolicyAccessGranted();
+                boolean isPolicyGranted = n != null && n.isNotificationPolicyAccessGranted();
                 // fixme 7.0手机 如果没有这个权限 直接调用setRingerMode会报出 Not allowed to change Do Not Disturb state的异常.
                 if (isPolicyGranted) {
                     mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
@@ -770,7 +790,6 @@ class VMoviePlayer extends StateMachine implements IPlayer {
                     } else if (isPreload) {
                         transitionTo(mPreparingState);
                         sendMessage(EVENT_TRY_TO_PREPARE);
-                    } else {
                     }
                     return HANDLED;
                 case EVENT_ERROR:
@@ -1070,16 +1089,9 @@ class VMoviePlayer extends StateMachine implements IPlayer {
         public boolean processMessage(Message msg) {
             switch (msg.what) {
                 case CMD_PLAY:
-                    if (needCareMeteredNetwork()) {
-                        MediaError error = new MediaError(MediaError.ERROR_METERED_NETWORK);
-                        error.setRestoreBundle(saveState());
-                        release();
-                        sendMessage(EVENT_ERROR, error);
-                    } else {
-                        transitionTo(mPlayingState);
-                        if (mInternalMediaPlayer != null) {
-                            mInternalMediaPlayer.start();
-                        }
+                    transitionTo(mPlayingState);
+                    if (mInternalMediaPlayer != null) {
+                        mInternalMediaPlayer.start();
                     }
                     return HANDLED;
                 case EVENT_UPDATE_ISLOOP:
@@ -1094,6 +1106,8 @@ class VMoviePlayer extends StateMachine implements IPlayer {
                     return HANDLED;
                 case EVENT_CHECK_ALLOW_METEREDNETWORK:
                     // completed状态下收到网络改变信息 什么都不做
+                    removeDeferredMessage(EVENT_CHECK_ALLOW_METEREDNETWORK);
+                    deferMessage(msg);
                     return HANDLED;
             }
             return NOT_HANDLED;
