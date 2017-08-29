@@ -531,7 +531,13 @@ class VMoviePlayer extends StateMachine implements IPlayer {
     }
 
     private void onStateChanged() {
-        mMainHandler.post(mStateChangeRunnable);
+        if (mLastState == mState) {
+            PlayerLog.d(TAG, "LastState == mState, doNothing");
+            return;
+        }
+        mMainHandler.post(new StateChangedRunnable(mLastState, mState));
+
+        mLastState = mState;
     }
 
     private Runnable mNotifyVideoSizeChangeRunnable = new Runnable() {
@@ -544,19 +550,22 @@ class VMoviePlayer extends StateMachine implements IPlayer {
         }
     };
 
-    private Runnable mStateChangeRunnable = new Runnable() {
+    private class StateChangedRunnable implements Runnable {
+        private final int lastState;
+        private final int state;
+
+        public StateChangedRunnable(int lastState, int state) {
+            this.lastState = lastState;
+            this.state = state;
+        }
+
         @Override
         public void run() {
-            if (mLastState == mState) {
-                PlayerLog.d(TAG, "LastState == mState, doNothing");
-                return;
-            }
             for (IVideoStateListener listener : mVideoStateListeners) {
-                listener.onStateChanged(mLastState, mState);
+                listener.onStateChanged(lastState, state);
             }
-            mLastState = mState;
         }
-    };
+    }
 
     private void startRegister() {
         // 音量物理按键
