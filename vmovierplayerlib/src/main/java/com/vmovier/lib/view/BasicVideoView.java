@@ -438,9 +438,9 @@ public class BasicVideoView extends FrameLayout {
         }
     }
 
-    public void setControllerVisibilityListener(OnControlViewVisibilityListener listener) {
+    public void setControllerListener(OnControlViewListener listener) {
         if (mControlView != null) {
-            mControlView.setOnVisibilityListener(listener);
+            mControlView.setOnControlViewListener(listener);
         }
     }
 

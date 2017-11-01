@@ -24,6 +24,7 @@ import com.vmovier.lib.player.IPlayer;
 import com.vmovier.lib.player.MediaError;
 import com.vmovier.lib.player.VideoViewDataSource;
 import com.vmovier.lib.utils.PlayerLog;
+import com.vmovier.lib.view.BasicVideoView;
 import com.vmovier.lib.view.IVideoStateListener;
 import com.vmovier.lib.view.VMovieVideoView;
 
@@ -43,7 +44,7 @@ public class VMovieVideoViewActivity extends AppCompatActivity implements Compou
     public static final String[] videoUrls = new String[] {
             "",
             "",
-            "http://vjs.zencdn.net/v/oceans.mp4",
+            "https://qiniu-vmovier5.vmoviercdn.com/599e5872da27b.mp4",
     };
 
     @BindView(R.id.VMovieVideoView)
@@ -171,6 +172,13 @@ public class VMovieVideoViewActivity extends AppCompatActivity implements Compou
         m.what = UPDATE_PROGRESS;
         mainHandler = new VideoHandler(this);
         mainHandler.sendMessageDelayed(m, 1000);
+
+        mainHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mVMovieVideoView.setVisibility(View.VISIBLE);
+            }
+        }, 500);
     }
 
     @Override
@@ -238,6 +246,11 @@ public class VMovieVideoViewActivity extends AppCompatActivity implements Compou
         super.onConfigurationChanged(newConfig);
         isPortrait = newConfig.orientation == Configuration.ORIENTATION_PORTRAIT;
         requestVideoLayoutParam();
+        if (isPortrait) {
+            mVMovieVideoView.setScreenMode(BasicVideoView.PLAYERSCREENMODE_PORTRAIT_INSET);
+        } else {
+            mVMovieVideoView.setScreenMode(BasicVideoView.PLAYERSCREENMODE_LANDSCAPE_FULLSCREEN);
+        }
     }
 
     private void requestVideoLayoutParam() {

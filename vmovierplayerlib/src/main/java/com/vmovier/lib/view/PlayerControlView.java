@@ -21,7 +21,7 @@ import java.util.Locale;
 
 public class PlayerControlView extends FrameLayout implements IPlayerControlView {
     // 显示时长
-    public static final int DEFAULT_SHOW_TIMEOUT_MS = 5000;
+    public static final int DEFAULT_SHOW_TIMEOUT_MS = 2000;
     // 更新Progress的频率
     private static final int DEFAULT_UPDATE_PROGRESS_MS = 1000;
     // Progressbar的 max
@@ -36,11 +36,11 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
     // 横屏全屏模式
     public static final int PLAYERSCREENMODE_LANDSCAPE_FULLSCREEN = BasicVideoView.PLAYERSCREENMODE_LANDSCAPE_FULLSCREEN;
 
-
     private ImageView mPlayView, mPauseView;
     private TextView mPositionView, mDurationView;
     private SeekBar mProgressBar;
-    private View mTopLayout, mBottomLayout;
+    private View mTopLayout, mBottomLayout, mCenterLayout, mLockLayout;
+    private View mLockView, mUnLockView;
 
     private int mShowTimeoutMs;
     private IPlayer mPlayer;
@@ -61,8 +61,9 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
 
     private PlayerVisibilityUtils.VisibilityAnimateProvider mTopProvider;
     private PlayerVisibilityUtils.VisibilityAnimateProvider mBottomProvider;
-    private OnControlViewVisibilityListener mOnVisibilityListener;
+    private OnControlViewListener mOnControlViewListener;
 
+    private boolean mIsLocking = false;
 
     private final Runnable updateProgressAction = new Runnable() {
         @Override
@@ -124,76 +125,116 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
         mTopProvider = sTopProvider;
         mBottomProvider = sBottomProvider;
 
-        initControllerViewByOrientation();
-        // 默认不显示
-        setVisibility(GONE);
+        initControllerViewByOrientation(true);
+//        setVisibility(VISIBLE);
     }
 
     private void initControllerViewByOrientation() {
-        View orientationControllerView;
+        initControllerViewByOrientation(false);
+    }
+
+    private View mControlView;
+
+    private void initControllerViewByOrientation(boolean firstInit) {
         switch (mCurrentViewMode) {
             case PLAYERSCREENMODE_PORTRAIT_INSET:
-                orientationControllerView = mPortraitInsetView;
+                mControlView = mPortraitInsetView;
                 break;
             case PLAYERSCREENMODE_PORTRAIT_FULLSCREEN:
-                orientationControllerView = mPortraitFullScreenView;
+                mControlView = mPortraitFullScreenView;
                 break;
             case PLAYERSCREENMODE_LANDSCAPE_FULLSCREEN:
-                orientationControllerView = mLandscapeView;
+                mControlView = mLandscapeView;
                 break;
             default:
-                orientationControllerView = mPortraitInsetView;
+                mControlView = mPortraitInsetView;
                 break;
         }
-
+        // 移除全部View
         removeAllViews();
-        addView(orientationControllerView);
+        // 加上controlView
+        addView(mControlView);
 
         computeControlViewSize();
 
-        mTopLayout = orientationControllerView.findViewById(R.id.player_control_top_layout);
+        mTopLayout = mControlView.findViewById(R.id.player_control_top_layout);
         if (mTopLayout != null) {
             PlayerVisibilityUtils.setVisibilityAnimateProvider(mTopLayout, mTopProvider);
-            if (PlayerVisibilityUtils.getTargetVisibility(mTopLayout) != VISIBLE) {
-                PlayerVisibilityUtils.setTargetVisibility(mTopLayout, View.VISIBLE);
+            if (firstInit) {
+                PlayerVisibilityUtils.setTargetVisibility(mTopLayout, GONE, 0);
+            } else {
+                PlayerVisibilityUtils.setTargetVisibility(mTopLayout, VISIBLE);
             }
         }
 
-        mBottomLayout = orientationControllerView.findViewById(R.id.player_control_bottom_layout);
+        mBottomLayout = mControlView.findViewById(R.id.player_control_bottom_layout);
         if (mBottomLayout != null) {
             PlayerVisibilityUtils.setVisibilityAnimateProvider(mBottomLayout, mBottomProvider);
-            if (PlayerVisibilityUtils.getTargetVisibility(mBottomLayout) != VISIBLE) {
-                PlayerVisibilityUtils.setTargetVisibility(mBottomLayout, View.VISIBLE);
+            if (firstInit) {
+                PlayerVisibilityUtils.setTargetVisibility(mBottomLayout, GONE, 0);
+            } else {
+                PlayerVisibilityUtils.setTargetVisibility(mBottomLayout, VISIBLE);
             }
         }
 
-        mPlayView = (ImageView) orientationControllerView.findViewById(R.id.player_control_play);
+        mCenterLayout = mControlView.findViewById(R.id.player_control_center_layout);
+        if (mCenterLayout != null) {
+            if (firstInit) {
+                PlayerVisibilityUtils.setTargetVisibility(mCenterLayout, GONE, 0);
+            } else {
+                PlayerVisibilityUtils.setTargetVisibility(mCenterLayout, VISIBLE);
+            }
+        }
+
+        mLockLayout = mControlView.findViewById(R.id.player_control_lock_layout);
+        if (mLockLayout != null) {
+            if (firstInit) {
+                PlayerVisibilityUtils.setTargetVisibility(mLockLayout, GONE, 0);
+            } else {
+                PlayerVisibilityUtils.setTargetVisibility(mLockLayout, VISIBLE);
+            }
+        }
+
+        mPlayView = mControlView.findViewById(R.id.player_control_play);
         if (mPlayView != null) {
             mPlayView.setOnClickListener(componentListener);
         }
 
-        mPauseView = (ImageView) orientationControllerView.findViewById(R.id.player_control_pause);
+        mPauseView = mControlView.findViewById(R.id.player_control_pause);
         if (mPauseView != null) {
             mPauseView.setOnClickListener(componentListener);
         }
 
-        mPositionView = (TextView) orientationControllerView.findViewById(R.id.player_control_position);
+        mPositionView = mControlView.findViewById(R.id.player_control_position);
         if (mPositionView != null) {
             mPositionView.setOnClickListener(componentListener);
         }
 
-        mDurationView = (TextView) orientationControllerView.findViewById(R.id.player_control_duration);
+        mDurationView = mControlView.findViewById(R.id.player_control_duration);
         if (mDurationView != null) {
             mDurationView.setOnClickListener(componentListener);
         }
 
-        mProgressBar = (SeekBar) orientationControllerView.findViewById(R.id.player_control_progress);
+        mProgressBar = mControlView.findViewById(R.id.player_control_progress);
         if (mProgressBar != null) {
             mProgressBar.setOnSeekBarChangeListener(componentListener);
             mProgressBar.setMax(PROGRESS_BAR_MAX);
         }
 
+        mIsLocking = false; // reset
+        mLockView = mControlView.findViewById(R.id.player_control_lock);
+        if (mLockView != null) {
+            mLockView.setOnClickListener(componentListener);
+            PlayerVisibilityUtils.setTargetVisibility(mLockView, GONE);
+        }
+
+        mUnLockView = mControlView.findViewById(R.id.player_control_unlock);
+        if (mUnLockView != null) {
+            mUnLockView.setOnClickListener(componentListener);
+            PlayerVisibilityUtils.setTargetVisibility(mUnLockView, VISIBLE);
+        }
     }
+
 
     private void computeControlViewSize() {
         int screenWidth = getScreenWidth(getContext());
@@ -273,23 +314,21 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
         if (this.mCurrentViewMode == screenMode) return;
         this.mCurrentViewMode = screenMode;
         initControllerViewByOrientation();
+        hide();
     }
 
     @Override
     public void show() {
-        if (!isVisible()) {
-            if (mTopLayout != null) {
-                // 如果允许自己做动画 就动画变成Visible.
-                PlayerVisibilityUtils.setTargetVisibility(mTopLayout, View.VISIBLE);
-            }
-            if (mBottomLayout != null) {
-                PlayerVisibilityUtils.setTargetVisibility(mBottomLayout, View.VISIBLE);
-            }
-            PlayerVisibilityUtils.setTargetVisibility(this, View.VISIBLE);
-            if (mOnVisibilityListener != null) {
-                mOnVisibilityListener.onVisibilityChange(true);
-            }
+        if (getVisibility() != VISIBLE) {
+            setVisibility(VISIBLE);
+        }
+        if (!mIsLocking) {
+            showControlView();
             updateAll();
+        }
+        showLockView();
+        if (mOnControlViewListener != null) {
+            mOnControlViewListener.onVisibilityChange(true);
         }
         hideAfterTimeout();
     }
@@ -299,30 +338,23 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
      */
     @Override
     public void hide() {
-        if (isVisible()) {
-            // 如果允许自己做动画 就自己做,否则就跟随整体一起消失就好了
-            if (mTopLayout != null) {
-                PlayerVisibilityUtils.setTargetVisibility(mTopLayout, View.GONE);
-            }
-            if (mBottomLayout != null) {
-                PlayerVisibilityUtils.setTargetVisibility(mBottomLayout, View.GONE);
-            }
-            PlayerVisibilityUtils.setTargetVisibility(this, View.GONE);
-            if (mOnVisibilityListener != null) {
-                mOnVisibilityListener.onVisibilityChange(false);
-            }
-            removeCallbacks(updateProgressAction);
-            removeCallbacks(hideAction);
+        // 如果允许自己做动画 就自己做,否则就跟随整体一起消失就好了
+        if (!mIsLocking) {
+            hideControlView();
         }
+        hideLockView();
+        if (mOnControlViewListener != null) {
+            mOnControlViewListener.onVisibilityChange(false);
+        }
+        removeCallbacks(updateProgressAction);
+        removeCallbacks(hideAction);
     }
 
     @Override
     public void hideAfterTimeout() {
         removeCallbacks(hideAction);
         if (mShowTimeoutMs > 0) {
-            if (isAttachedToWindow) {
                 postDelayed(hideAction, mShowTimeoutMs);
-            }
         }
     }
 
@@ -372,15 +404,35 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
      */
     @Override
     public boolean isVisible() {
-        return PlayerVisibilityUtils.isTargetVisible(this);
+        boolean isVisible = false;
+        switch (mCurrentViewMode) {
+            case PLAYERSCREENMODE_PORTRAIT_INSET:
+            case PLAYERSCREENMODE_PORTRAIT_FULLSCREEN:
+                isVisible = mTopLayout != null && PlayerVisibilityUtils.isTargetVisible(mTopLayout);
+                break;
+            case PLAYERSCREENMODE_LANDSCAPE_FULLSCREEN:
+                if (mIsLocking) {
+                    isVisible = mLockLayout != null && PlayerVisibilityUtils.isTargetVisible(mLockLayout);
+                } else {
+                    isVisible = mTopLayout != null && PlayerVisibilityUtils.isTargetVisible(mTopLayout);
+                }
+                break;
+        }
+        return isVisible;
+    }
+
+
+    @Override
+    public boolean isLocking() {
+        return mIsLocking;
     }
 
     @Override
-    public void setOnVisibilityListener(OnControlViewVisibilityListener listener) {
-        if (mOnVisibilityListener == listener) {
+    public void setOnControlViewListener(OnControlViewListener listener) {
+        if (mOnControlViewListener == listener) {
             return;
         }
-        this.mOnVisibilityListener = listener;
+        this.mOnControlViewListener = listener;
     }
 
     @Override
@@ -399,23 +451,60 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
         hide();
     }
 
+    private void showLockView() {
+        if (mLockLayout != null) {
+            PlayerVisibilityUtils.setTargetVisibility(mLockLayout, VISIBLE);
+        }
+    }
+
+    private void hideLockView() {
+        if (mLockLayout != null) {
+            PlayerVisibilityUtils.setTargetVisibility(mLockLayout, GONE);
+        }
+    }
+
+    private void showControlView() {
+        if (mTopLayout != null) {
+            // 如果允许自己做动画 就动画变成Visible.
+            PlayerVisibilityUtils.setTargetVisibility(mTopLayout, VISIBLE);
+        }
+        if (mBottomLayout != null) {
+            PlayerVisibilityUtils.setTargetVisibility(mBottomLayout, VISIBLE);
+        }
+        if (mCenterLayout != null) {
+            PlayerVisibilityUtils.setTargetVisibility(mCenterLayout, VISIBLE);
+        }
+    }
+
+    private void hideControlView() {
+        if (mTopLayout != null) {
+            // 如果允许自己做动画 就动画变成Visible.
+            PlayerVisibilityUtils.setTargetVisibility(mTopLayout, GONE);
+        }
+        if (mBottomLayout != null) {
+            PlayerVisibilityUtils.setTargetVisibility(mBottomLayout, GONE);
+        }
+        if (mCenterLayout != null) {
+            PlayerVisibilityUtils.setTargetVisibility(mCenterLayout, GONE);
+        }
+    }
+
     private void updateAll() {
         updatePlayPauseButton();
         updateProgress();
     }
 
     private void updatePlayPauseButton() {
-        // 暂时交给上层去控制把, 等以后想明白了再写.
-//        if (!isVisible() || !isAttachedToWindow) {
-//            return;
-//        }
-//        boolean playing = mPlayer != null && mPlayer.isPlaying();
-//        if (mPlayView != null) {
-//            mPlayView.setVisibility(playing ? View.GONE : View.VISIBLE);
-//        }
-//        if (mPauseView != null) {
-//            mPauseView.setVisibility(!playing ? View.GONE : View.VISIBLE);
-//        }
+        if (!isVisible() || !isAttachedToWindow) {
+            return;
+        }
+        boolean playing = mPlayer != null && mPlayer.isPlaying();
+        if (mPlayView != null) {
+            mPlayView.setVisibility(playing ? View.GONE : View.VISIBLE);
+        }
+        if (mPauseView != null) {
+            mPauseView.setVisibility(!playing ? View.GONE : View.VISIBLE);
+        }
     }
 
     private void updateProgress() {
@@ -477,12 +566,40 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
         @Override
         public void onClick(View v) {
             // 点击重置隐藏时长
-            hideAfterTimeout();
             if (mPlayer != null) {
                 if (mPlayView == v) {
                     mPlayer.play();
+                    hide();
                 } else if (mPauseView == v) {
                     mPlayer.pause();
+                    hideAfterTimeout();
+                } else if (mLockView == v) {
+                    //  进入非锁屏状态
+                    mIsLocking = false;
+                    if (mUnLockView != null) {
+                        PlayerVisibilityUtils.setTargetVisibility(mUnLockView, VISIBLE);
+                    }
+                    if (mLockView != null) {
+                        PlayerVisibilityUtils.setTargetVisibility(mLockView, GONE);
+                    }
+                    show();
+                    if (mOnControlViewListener != null) {
+                        mOnControlViewListener.onLockStateChange(mIsLocking);
+                    }
+                } else if (mUnLockView == v) {
+                    // 进入锁屏状态
+                    mIsLocking = true;
+                    if (mUnLockView != null) {
+                        PlayerVisibilityUtils.setTargetVisibility(mUnLockView, GONE);
+                    }
+                    if (mLockView != null) {
+                        PlayerVisibilityUtils.setTargetVisibility(mLockView, VISIBLE);
+                    }
+                    hideControlView();
+                    hideAfterTimeout();
+                    if (mOnControlViewListener != null) {
+                        mOnControlViewListener.onLockStateChange(mIsLocking);
+                    }
                 }
             }
         }

@@ -71,6 +71,7 @@ public class OnDefaultGestureListener extends GestureDetector.SimpleOnGestureLis
     public boolean onDoubleTap(MotionEvent e) {
         PlayerLog.d(TAG, "onDoubleTap");
         if (mPlayer == null) return false;
+        if (mPlayerControlView != null && mPlayerControlView.isLocking()) return false;
         if (mPlayer.isPlaying()) {
             mPlayer.pause();
         } else {
@@ -85,6 +86,7 @@ public class OnDefaultGestureListener extends GestureDetector.SimpleOnGestureLis
             PlayerLog.e(TAG, "mTouchHeightUnit == 0 || mTouchWidthUnit == 0");
             return false;
         }
+        if (mPlayerControlView != null && mPlayerControlView.isLocking()) return false;
 
         float startX = e1.getRawX();
         float startY = e1.getRawY();

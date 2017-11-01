@@ -15,7 +15,8 @@ public interface IPlayerControlView {
     void setTopAnimateProvider(PlayerVisibilityUtils.VisibilityAnimateProvider topProvider);
     void setBottomAnimateProvider(PlayerVisibilityUtils.VisibilityAnimateProvider bottomProvider);
     boolean isVisible();
-    void setOnVisibilityListener(OnControlViewVisibilityListener listener);
+    boolean isLocking();
+    void setOnControlViewListener(OnControlViewListener listener);
     int getVideoViewHeight();
     int getVideoViewWidth();
     Context getContext();

@@ -5,9 +5,13 @@
     <item name="player_control_position" type="id"/>
     <item name="player_control_duration" type="id"/>
     <item name="player_control_progress" type="id"/>
+    <item name="player_control_center_layout" type="id"/>
     <item name="player_control_top_layout" type="id"/>
     <item name="player_control_bottom_layout" type="id"/>
     <item name="player_control_mask_layout" type="id"/>
+    <item name="player_control_lock_layout" type="id" />
+    <item name="player_control_lock" type="id"/>
+    <item name="player_control_unlock" type="id"/>
 
     <item type="id" name="player_target_visibility">false</item>
     <item type="id" name="player_visibility_animator_provider">false</item>
