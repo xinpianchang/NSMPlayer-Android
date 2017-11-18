@@ -37,7 +37,7 @@ allprojects {
 }
 
 dependencies {
-    compile 'com.vmovier.libs:player:2.5.4' 
+    compile 'com.vmovier.libs:player:2.6.3' 
 }
 ```
 
