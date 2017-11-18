@@ -44,7 +44,7 @@ public class VMovieVideoViewActivity extends AppCompatActivity implements Compou
     public static final String[] videoUrls = new String[] {
             "",
             "",
-            "https://qiniu-vmovier5.vmoviercdn.com/599e5872da27b.mp4",
+            "http://vjs.zencdn.net/v/oceans.mp4",
     };
 
     @BindView(R.id.VMovieVideoView)

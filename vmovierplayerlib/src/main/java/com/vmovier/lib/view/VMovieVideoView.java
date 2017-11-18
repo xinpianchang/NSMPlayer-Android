@@ -113,16 +113,16 @@ public class VMovieVideoView extends BasicVideoView {
         setKeepScreenOn(true);
         setBackground(new ColorDrawable(Color.BLACK));
 
-        mPlayer = IPlayerFactory.newInstance(context);
-        mPlayer.setAutoPlay(isAutoPlay);
-        mPlayer.setPreload(isPreload);
-        mPlayer.setPlayerType(playerType);
-        mPlayer.setLoop(isLoop);
-        mPlayer.setMuted(isMuted);
-        mPlayer.setMediaDataSource(dataSource);
+        IPlayer player = IPlayerFactory.newInstance(context);
+        player.setAutoPlay(isAutoPlay);
+        player.setPreload(isPreload);
+        player.setPlayerType(playerType);
+        player.setLoop(isLoop);
+        player.setMuted(isMuted);
+        player.setMediaDataSource(dataSource);
 
         mOnGenerateGestureDetectorListener = new OnDefaultGenerateGestureDetectorListener();
-        super.setPlayer(mPlayer);
+        super.setPlayer(player);
 
         mFormatBuilder = new StringBuilder();
         mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());

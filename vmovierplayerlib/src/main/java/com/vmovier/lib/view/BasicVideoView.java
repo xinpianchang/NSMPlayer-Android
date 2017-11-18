@@ -477,6 +477,10 @@ public class BasicVideoView extends FrameLayout {
     }
 
     public void setPlayer(IPlayer player) {
+        setPlayer(player, false);
+    }
+
+    public void setPlayer(IPlayer player, boolean showController) {
         if (mPlayer == player) return;
         if (this.mPlayer != null) {
             this.mPlayer.removeVideoSizeListener(mVideoListener);
@@ -501,7 +505,9 @@ public class BasicVideoView extends FrameLayout {
             if (mPlayer.isCurrentState(IPlayer.STATE_MASK_PREPARED)) {
                 hidePosterView();
             }
-            showController();
+            if (showController) {
+                showController();
+            }
         } else {
             hideController();
         }
@@ -539,7 +545,6 @@ public class BasicVideoView extends FrameLayout {
             mGestureDetector = mOnGenerateGestureDetectorListener.generateGestureDetector(getContext(), mPlayer, mControlView);
         }
     }
-
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
