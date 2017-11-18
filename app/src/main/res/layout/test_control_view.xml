@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
     <ImageView
         android:id="@id/player_control_play"
-        android:src="@drawable/exo_controls_next"
+        android:src="@mipmap/ic_launcher"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </LinearLayout>

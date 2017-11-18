@@ -38,9 +38,9 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.google.android.exoplayer:exoplayer:r2.5.4'
-    compile "com.android.support:appcompat-v7:$googleSupportVersion"
-    compile "com.github.bumptech.glide:glide:$glideSupportVersion"
+    implementation 'com.google.android.exoplayer:exoplayer:r2.5.4'
+    implementation "com.android.support:appcompat-v7:$googleSupportVersion"
+    implementation "com.github.bumptech.glide:glide:$glideSupportVersion"
 }
 
 uploadArchives {
