@@ -35,7 +35,6 @@ public class BasicVideoViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             if (RecyclerViewHolder.class.isInstance(holder)) {
                 RecyclerViewHolder recyclerViewHolder = (RecyclerViewHolder) holder;
                 RecyclerVideoSource s = list.get(position);
-                recyclerViewHolder.basicVideoView.setPosterUrl(s.posterView);
             }
         }
 

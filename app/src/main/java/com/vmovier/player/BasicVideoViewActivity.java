@@ -111,8 +111,6 @@ public class BasicVideoViewActivity extends AppCompatActivity implements Compoun
         mPlayer.setPlayerType(isExo ? IPlayer.PLAYERTYPE_EXO : IPlayer.PLAYERTYPE_ANDROIDMEDIA);
         mPlayer.setMuted(isMuted);
 
-        mBasicVideoView.setPosterUrl("http://cs.vmoiver.com/Uploads/Magic/post/2016-12-05/584513723605e.jpg");
-
         ArrayAdapter<String> urlsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, videoTitles);
         urlsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mDataSourceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

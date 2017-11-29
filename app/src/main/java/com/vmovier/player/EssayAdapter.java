@@ -142,7 +142,6 @@ public class EssayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         void bindVideoViewHolderBean(EssayBean bean) {
             if (this.essayBean == bean) return;
             essayBean = bean;
-            basicVideoView.setPosterUrl(essayBean.postUrl);
         }
 
         @OnClick(R.id.startPlay)

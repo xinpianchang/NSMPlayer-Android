@@ -34,7 +34,6 @@ public class VMovieVideoViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         if (RecyclerViewHolder.class.isInstance(holder)) {
             RecyclerViewHolder recyclerViewHolder = (RecyclerViewHolder) holder;
             RecyclerVideoSource s = list.get(position);
-            recyclerViewHolder.vMovieVideoView.setPosterUrl(s.posterView);
             recyclerViewHolder.vMovieVideoView.setMediaDataSource(s.videoViewDataSource);
         }
     }

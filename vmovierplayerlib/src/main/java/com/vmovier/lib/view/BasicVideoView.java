@@ -19,7 +19,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 import com.vmovier.lib.player.IPlayer;
 import com.vmovier.lib.player.VideoSize;
 import com.vmovier.lib.utils.PlayerLog;
@@ -50,7 +49,6 @@ public class BasicVideoView extends FrameLayout {
 
     protected IPlayer mPlayer;
     protected ImageView mPosterView;
-    protected String mPosterUrl;
     protected VideoSize mVideoSize = new VideoSize();
     protected IRenderView mRenderView;
     protected IRenderView.ISurfaceHolder mSurfaceHolder;
@@ -459,17 +457,6 @@ public class BasicVideoView extends FrameLayout {
             mControlView.setPlayer(null);
         }
 
-    }
-
-    public void setPosterUrl(@NonNull String posterUrl) {
-        this.mPosterUrl = posterUrl;
-        if (mPosterView != null) {
-            Glide.with(getContext()).load(posterUrl).centerCrop().into(mPosterView);
-        }
-    }
-
-    public String getPosterUrl() {
-        return mPosterUrl;
     }
 
     public @Nullable IPlayer getPlayer() {

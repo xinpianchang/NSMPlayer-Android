@@ -11,16 +11,13 @@ import android.view.SurfaceHolder;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
@@ -29,7 +26,6 @@ import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -139,7 +135,7 @@ class WrapExoPlayer extends AbstractPlayer {
         mEventListener = new ExoEventListener();
         mInternalMediaPlayer.addListener(mEventListener);
         mVideoListener = new ExoVideoListener();
-        mInternalMediaPlayer.setVideoListener(mVideoListener);
+        mInternalMediaPlayer.addVideoListener(mVideoListener);
 
         MediaSource mediaSource = buildMediaSource(mUri, mHeaders);
         mInternalMediaPlayer.setVideoSurface(mSurface);
@@ -151,7 +147,7 @@ class WrapExoPlayer extends AbstractPlayer {
     public void release() {
         if (mInternalMediaPlayer != null) {
             mInternalMediaPlayer.removeListener(mEventListener);
-            mInternalMediaPlayer.setVideoListener(null);
+            mInternalMediaPlayer.removeVideoListener(mVideoListener);
             mInternalMediaPlayer.release();
             mInternalMediaPlayer = null;
             mEventListener = null;
@@ -207,11 +203,11 @@ class WrapExoPlayer extends AbstractPlayer {
 
         int state = mInternalMediaPlayer.getPlaybackState();
         switch (state) {
-            case ExoPlayer.STATE_BUFFERING:
-            case ExoPlayer.STATE_READY:
+            case Player.STATE_BUFFERING:
+            case Player.STATE_READY:
                 return mInternalMediaPlayer.getPlayWhenReady();
-            case ExoPlayer.STATE_IDLE:
-            case ExoPlayer.STATE_ENDED:
+            case Player.STATE_IDLE:
+            case Player.STATE_ENDED:
             default:
                 return false;
         }
@@ -335,29 +331,8 @@ class WrapExoPlayer extends AbstractPlayer {
         }
     }
 
-    private class ExoEventListener implements Player.EventListener {
+    private class ExoEventListener extends Player.DefaultEventListener {
         private boolean isBuffering = false;
-
-        /**
-         * Called when the value of {@link Player#getRepeatMode()} changes.
-         *
-         * @param repeatMode The {@link Player.RepeatMode} used for playback.
-         */
-        @Override
-        public void onRepeatModeChanged(int repeatMode) {
-            PlayerLog.d(TAG, "onRepeatModeChanged is " + repeatMode);
-        }
-
-        /**
-         * Called when the player starts or stops loading the source.
-         *
-         * @param isLoading Whether the source is currently being loaded.
-         */
-        @Override
-        public void onLoadingChanged(boolean isLoading) {
-            PlayerLog.d(TAG, "onLoadingChanged is " + isLoading);
-        }
-
         /**
          * Called when the value returned from either {@link ExoPlayer#getPlayWhenReady()} or
          * {@link ExoPlayer#getPlaybackState()} changes.
@@ -375,41 +350,30 @@ class WrapExoPlayer extends AbstractPlayer {
             mInternalPlayerState = playbackState;
             if (isBuffering) {
                 switch (playbackState) {
-                    case ExoPlayer.STATE_ENDED:
-                    case ExoPlayer.STATE_READY:
+                    case Player.STATE_ENDED:
+                    case Player.STATE_READY:
                         notifyOnInfo(IInternalPlayer.MEDIA_INFO_BUFFERING_END, getBufferedPercentage());
                         isBuffering = false;
                         break;
                 }
             }
             switch (playbackState) {
-                case ExoPlayer.STATE_IDLE:
+                case Player.STATE_IDLE:
                     PlayerLog.d(TAG, "WrapExoPlayer.STATE_IDLE");
                     break;
-                case ExoPlayer.STATE_BUFFERING:
+                case Player.STATE_BUFFERING:
                     PlayerLog.d(TAG, "WrapExoPlayer.STATE_BUFFERING");
                     notifyOnInfo(IInternalPlayer.MEDIA_INFO_BUFFERING_START, getBufferedPercentage());
                     isBuffering = true;
                     break;
-                case ExoPlayer.STATE_READY:
+                case Player.STATE_READY:
                     PlayerLog.d(TAG, "WrapExoPlayer.STATE_READY");
                     break;
-                case ExoPlayer.STATE_ENDED:
+                case Player.STATE_ENDED:
                     PlayerLog.d(TAG, "WrapExoPlayer.STATE_ENDED");
                     notifyOnCompletion();
                     break;
             }
-        }
-
-        /**
-         * Called when timeline and/or manifest has been refreshed.
-         *
-         * @param timeline The latest timeline, or null if the timeline is being cleared.
-         * @param manifest The latest manifest, or null if the manifest is being cleared.
-         */
-        @Override
-        public void onTimelineChanged(Timeline timeline, Object manifest) {
-            PlayerLog.d(TAG, "onTimelineChanged");
         }
 
         /**
@@ -451,26 +415,6 @@ class WrapExoPlayer extends AbstractPlayer {
             }
             notifyOnError(error);
             PlayerLog.d(TAG, "onPlayerError   " + error.toString());
-        }
-
-        /**
-         * Called when a position discontinuity occurs. Position discontinuities occur when seeks are
-         * performed, when playbacks transition from one period in the timeline to the next, and when
-         * the player introduces discontinuities internally.
-         */
-        @Override
-        public void onPositionDiscontinuity() {
-            // PlayerLog.d(TAG, "onPositionDiscontinuity");
-        }
-
-        @Override
-        public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
-        }
-
-        @Override
-        public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-
         }
     }
 
