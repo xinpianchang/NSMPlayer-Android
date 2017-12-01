@@ -1,6 +1,7 @@
 package com.vmovier.lib.player;
 
 import android.os.Bundle;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.Surface;
@@ -9,6 +10,9 @@ import android.view.SurfaceHolder;
 import com.vmovier.lib.player.internal.IInternalPlayer;
 import com.vmovier.lib.view.IVideoStateListener;
 import com.vmovier.lib.view.IVideoSizeListener;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 
 /**
@@ -30,6 +34,10 @@ public interface IPlayer {
     String SAVE_ALLOWMETEREDNETWORK = "save_allowmeterednetwork";
 
     // 播放器类型
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({PLAYERTYPE_ANDROIDMEDIA, PLAYERTYPE_EXO})
+    @interface PlayerType{}
+
     int PLAYERTYPE_ANDROIDMEDIA = IInternalPlayer.PLAYERTYPE_ANDROIDMEDIA;
     int PLAYERTYPE_EXO = IInternalPlayer.PLAYERTYPE_EXO;
 
@@ -72,7 +80,7 @@ public interface IPlayer {
     @Nullable
     VideoViewDataSource getMediaDataSource();
 
-    void setPlayerType(int type);
+    void setPlayerType(@PlayerType int type);
 
     int getPlayerType();
 

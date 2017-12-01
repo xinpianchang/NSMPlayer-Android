@@ -17,6 +17,7 @@
     <attr name="needShowPosterView" format="boolean"/>
     <attr name="posterAnimatorDuration" format="integer"/>
     <attr name="useController" format="boolean"/>
+    <attr name="defaultShowController" format="boolean" />
     <attr name="controllerShowTimeoutMs" format="integer"/>
 
     <declare-styleable name="BasicVideoView">
@@ -25,6 +26,7 @@
         <attr name="needShowPosterView"/>
         <attr name="posterAnimatorDuration" />
         <attr name="useController" />
+        <attr name="defaultShowController"/>
         <attr name="controllerShowTimeoutMs"/>
     </declare-styleable>
 
@@ -46,6 +48,7 @@
         <attr name="needShowPosterView"/>
         <attr name="posterAnimatorDuration" />
         <attr name="useController" />
+        <attr name="defaultShowController"/>
         <attr name="controllerShowTimeoutMs"/>
     </declare-styleable>
 

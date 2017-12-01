@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.annotation.CallSuper;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -27,6 +28,8 @@ import com.vmovier.lib.view.render.SurfaceRenderView;
 import com.vmovier.lib.view.render.TextureRenderView;
 import com.vmovier.player.R;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Formatter;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -46,6 +49,8 @@ public class BasicVideoView extends FrameLayout {
     protected int mRenderType;
     // 是否使用默认的Controller
     protected boolean mUseController = true;
+    // 是否默认显示Controller
+    protected boolean mDefaultShowController = false;
 
     protected IPlayer mPlayer;
     protected ImageView mPosterView;
@@ -59,6 +64,9 @@ public class BasicVideoView extends FrameLayout {
     protected StringBuilder mFormatBuilder;
     protected Formatter mFormatter;
 
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({PLAYERSCREENMODE_PORTRAIT_INSET, PLAYERSCREENMODE_PORTRAIT_FULLSCREEN, PLAYERSCREENMODE_LANDSCAPE_FULLSCREEN})
+    public @interface PlayerScreenMode{}
     // 竖屏小屏模式
     public static final int PLAYERSCREENMODE_PORTRAIT_INSET = 1;
     // 竖屏全屏模式
@@ -66,6 +74,9 @@ public class BasicVideoView extends FrameLayout {
     // 横屏全屏模式
     public static final int PLAYERSCREENMODE_LANDSCAPE_FULLSCREEN = 3;
 
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({SCALE_FIT_PARENT, SCALE_FILL_PARENT, SCALE_WRAP_CONTENT, SCALE_MATCH_PARENT, SCALE_16_9_FIT_PARENT, SCALE_4_3_FIT_PARENT})
+    public @interface ScaleType{}
     public static final int SCALE_FIT_PARENT = IRenderView.SCALE_FIT_PARENT; // without clip
     public static final int SCALE_FILL_PARENT = IRenderView.SCALE_FILL_PARENT; // may clip
     public static final int SCALE_WRAP_CONTENT = IRenderView.SCALE_WRAP_CONTENT;
@@ -73,6 +84,9 @@ public class BasicVideoView extends FrameLayout {
     public static final int SCALE_16_9_FIT_PARENT = IRenderView.SCALE_16_9_FIT_PARENT;
     public static final int SCALE_4_3_FIT_PARENT = IRenderView.SCALE_4_3_FIT_PARENT;
 
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({RENDER_NONE, RENDER_SURFACE_VIEW, RENDER_TEXTURE_VIEW})
+    public @interface RenderType{}
     public static final int RENDER_NONE = 0;
     public static final int RENDER_SURFACE_VIEW = 1;
     public static final int RENDER_TEXTURE_VIEW = 2;
@@ -119,6 +133,7 @@ public class BasicVideoView extends FrameLayout {
                 mRenderType = a.getInteger(R.styleable.BasicVideoView_renderViewType, RENDER_SURFACE_VIEW);
                 mScaleType = a.getInteger(R.styleable.BasicVideoView_scaleType, SCALE_FIT_PARENT);
                 mUseController = a.getBoolean(R.styleable.BasicVideoView_useController, false);
+                mDefaultShowController = a.getBoolean(R.styleable.BasicVideoView_defaultShowController, false);
                 mNeedShowPosterView = a.getBoolean(R.styleable.BasicVideoView_needShowPosterView, false);
                 mPosterAnimatorDuration = a.getInteger(R.styleable.BasicVideoView_posterAnimatorDuration, DEFAULT_POSTER_ANIMATOR_DURATION);
             } finally {
@@ -363,7 +378,7 @@ public class BasicVideoView extends FrameLayout {
         return mScaleType;
     }
 
-    public void setScaleType(int scaleType) {
+    public void setScaleType(@ScaleType int scaleType) {
         if (this.mScaleType == scaleType) {
             return;
         }
@@ -388,12 +403,20 @@ public class BasicVideoView extends FrameLayout {
         return mRenderType;
     }
 
-    public void setRenderType(int renderType) {
+    public void setRenderType(@RenderType int renderType) {
         if (this.mRenderType == renderType) {
             return;
         }
         this.mRenderType = renderType;
         setRender(mRenderType);
+    }
+
+    public boolean isDefaultShowController() {
+        return mDefaultShowController;
+    }
+
+    public void setDefaultShowController(boolean defaultShowController) {
+        this.mDefaultShowController = defaultShowController;
     }
 
     public int getControllerShowTimeoutMs() {
@@ -410,7 +433,7 @@ public class BasicVideoView extends FrameLayout {
         return mControlView != null && mControlView.isVisible();
     }
 
-    public void setScreenMode(int screenMode) {
+    public void setScreenMode(@PlayerScreenMode int screenMode) {
         if (mScreenMode == screenMode) return;
         mScreenMode = screenMode;
 
@@ -464,10 +487,6 @@ public class BasicVideoView extends FrameLayout {
     }
 
     public void setPlayer(IPlayer player) {
-        setPlayer(player, false);
-    }
-
-    public void setPlayer(IPlayer player, boolean showController) {
         if (mPlayer == player) return;
         if (this.mPlayer != null) {
             this.mPlayer.removeVideoSizeListener(mVideoListener);
@@ -492,7 +511,7 @@ public class BasicVideoView extends FrameLayout {
             if (mPlayer.isCurrentState(IPlayer.STATE_MASK_PREPARED)) {
                 hidePosterView();
             }
-            if (showController) {
+            if (mDefaultShowController) {
                 showController();
             }
         } else {

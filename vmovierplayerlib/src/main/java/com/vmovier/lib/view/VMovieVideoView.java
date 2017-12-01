@@ -82,6 +82,7 @@ public class VMovieVideoView extends BasicVideoView {
                 mRenderType = a.getInteger(R.styleable.VMovieVideoView_renderViewType, RENDER_SURFACE_VIEW);
                 mScaleType = a.getInteger(R.styleable.VMovieVideoView_scaleType, SCALE_FIT_PARENT);
                 mUseController = a.getBoolean(R.styleable.VMovieVideoView_useController, false);
+                mDefaultShowController = a.getBoolean(R.styleable.VMovieVideoView_defaultShowController, false);
                 mNeedShowPosterView = a.getBoolean(R.styleable.VMovieVideoView_needShowPosterView, false);
                 mPosterAnimatorDuration = a.getInteger(R.styleable.VMovieVideoView_posterAnimatorDuration, DEFAULT_POSTER_ANIMATOR_DURATION);
 
@@ -227,7 +228,7 @@ public class VMovieVideoView extends BasicVideoView {
         return mPlayer.isAllowMeteredNetwork();
     }
 
-    public void setPlayerType(int type) {
+    public void setPlayerType(@IPlayer.PlayerType int type) {
         mPlayer.setPlayerType(type);
     }
 
@@ -310,16 +311,6 @@ public class VMovieVideoView extends BasicVideoView {
     public void setPlayer(IPlayer player) {
 //        super.setPlayer(player);
         // 暂时不支持切换
-    }
-
-    @Override
-    public void setScreenMode(int screenMode) {
-        if (mScreenMode == screenMode) return;
-        mScreenMode = screenMode;
-
-        if (mControlView != null) {
-            mControlView.setScreenMode(screenMode);
-        }
     }
 
     private void restoreInstanceState(Bundle restoreBundle) {
