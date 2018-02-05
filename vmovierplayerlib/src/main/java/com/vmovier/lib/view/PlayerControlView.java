@@ -39,7 +39,7 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
     private ImageView mPlayView, mPauseView;
     private TextView mPositionView, mDurationView;
     private SeekBar mProgressBar;
-    private View mTopLayout, mBottomLayout, mCenterLayout, mLockLayout;
+    private View mMaskLayout, mTopLayout, mBottomLayout, mCenterLayout, mLockLayout;
     private View mLockView, mUnLockView;
 
     private int mShowTimeoutMs;
@@ -126,7 +126,7 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
         mBottomProvider = sBottomProvider;
 
         initControllerViewByOrientation(true);
-//        setVisibility(VISIBLE);
+        setVisibility(VISIBLE);
     }
 
     private void initControllerViewByOrientation() {
@@ -156,6 +156,16 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
         addView(mControlView);
 
         computeControlViewSize();
+
+        mMaskLayout = mControlView.findViewById(R.id.player_control_mask_layout);
+        if (mMaskLayout != null) {
+            PlayerVisibilityUtils.setVisibilityAnimateProvider(mMaskLayout, sMaskProvider);
+            if (firstInit) {
+                PlayerVisibilityUtils.setTargetVisibility(mMaskLayout, GONE, 0);
+            } else {
+                PlayerVisibilityUtils.setTargetVisibility(mMaskLayout, VISIBLE);
+            }
+        }
 
         mTopLayout = mControlView.findViewById(R.id.player_control_top_layout);
         if (mTopLayout != null) {
@@ -319,9 +329,7 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
 
     @Override
     public void show() {
-        if (getVisibility() != VISIBLE) {
-            setVisibility(VISIBLE);
-        }
+        showMaskView();
         if (!mIsLocking) {
             showControlView();
             updateAll();
@@ -343,6 +351,7 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
             hideControlView();
         }
         hideLockView();
+        hideMaskView();
         if (mOnControlViewListener != null) {
             mOnControlViewListener.onVisibilityChange(false);
         }
@@ -408,13 +417,13 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
         switch (mCurrentViewMode) {
             case PLAYERSCREENMODE_PORTRAIT_INSET:
             case PLAYERSCREENMODE_PORTRAIT_FULLSCREEN:
-                isVisible = mTopLayout != null && PlayerVisibilityUtils.isTargetVisible(mTopLayout);
+                isVisible = mMaskLayout != null && PlayerVisibilityUtils.isTargetVisible(mMaskLayout);
                 break;
             case PLAYERSCREENMODE_LANDSCAPE_FULLSCREEN:
                 if (mIsLocking) {
                     isVisible = mLockLayout != null && PlayerVisibilityUtils.isTargetVisible(mLockLayout);
                 } else {
-                    isVisible = mTopLayout != null && PlayerVisibilityUtils.isTargetVisible(mTopLayout);
+                    isVisible = mMaskLayout != null && PlayerVisibilityUtils.isTargetVisible(mMaskLayout);
                 }
                 break;
         }
@@ -449,6 +458,18 @@ public class PlayerControlView extends FrameLayout implements IPlayerControlView
         removeCallbacks(updateProgressAction);
         removeCallbacks(hideAction);
         hide();
+    }
+
+    private void showMaskView() {
+        if (mMaskLayout != null) {
+            PlayerVisibilityUtils.setTargetVisibility(mMaskLayout, VISIBLE);
+        }
+    }
+
+    private void hideMaskView() {
+        if (mMaskLayout != null) {
+            PlayerVisibilityUtils.setTargetVisibility(mMaskLayout, GONE);
+        }
     }
 
     private void showLockView() {

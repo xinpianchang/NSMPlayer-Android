@@ -13,7 +13,7 @@
             android:id="@+id/VMovieVideoView"
             app:needShowPosterView="true"
             app:useController="true"
-            app:defaultShowController="true"
+            app:defaultShowController="false"
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>

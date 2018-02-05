@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@id/player_control_mask_layout"
     android:background="#50000000">
     <FrameLayout
         android:id="@id/player_control_center_layout"

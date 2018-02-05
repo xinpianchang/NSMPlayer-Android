@@ -37,7 +37,7 @@ allprojects {
 }
 
 dependencies {
-    compile 'com.vmovier.libs:player:2.7.0' 
+    compile 'com.vmovier.libs:player:2.7.3' 
 }
 ```
 
@@ -194,7 +194,7 @@ mVMovieVideoView.suspend();
 ```Java
 mVMovieVideoView.resume();
 ```
-这个地方要特殊说明一下，rusume()方法 只有在播放器调用过suspend()以后调用才会有作用，平时调用是不会有回应的。
+这个地方要特殊说明一下，resume()方法 只有在播放器调用过suspend()以后调用才会有作用，平时调用是不会有回应的。
 
 当你在一个 `Activity` 中使用 `VMovieVideoView` 的时候，你可以在 `onStop()` 中调用 `mVMovieVideoView.suspend()` 进行销毁播放器。 在 `Activity` 的 `onStart()` 中去调用 `mVMovieVideoView.resume()` 进行恢复， 当然这都仅仅是建议，具体如何使用需要看你自己的业务要求。
 值得一提的是，如果你在 `Activity.onStop()` 之后调用过 `mVMovieVideoView.suspend()` 的话，接下来就算你的 `Activity` 被系统回收掉，等你再回来这个`Activity` 的时候，`VMovieVideoView` 依然能恢复到原本的状态，不过这个时候你要防止在你 `Activity.onCreate()` 中再次去初始化播放器，那样会破坏掉你之前存储的播放状态。
